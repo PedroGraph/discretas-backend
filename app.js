@@ -8,7 +8,7 @@ const cors = require('cors');
 
 //  CORS
 const whitelist = 
-["http://192.168.1.8:5173", "http://172.27.16.1:5173/", "http://172.0.0.1:5173/", "https://discretas-frontend.vercel.app/"]
+["http://192.168.1.8:5173", "http://172.27.16.1:5173/", "http://172.0.0.1:5173/", "https://discretas-frontend.vercel.app/","https://64de72e99e301707fed05ee3--monumental-rugelach-0bcfb0.netlify.app/"]
 const corsOptions = {
   origin: (origin, callback) => {
     if (whitelist.includes(origin)) {
