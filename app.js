@@ -8,7 +8,7 @@ const cors = require('cors');
 
 //  CORS
 const whitelist = 
-["http://192.168.1.8:5173", "http://172.27.16.1:5173/", "http://172.0.0.1:5173/"]
+["http://192.168.1.8:5173", "http://172.27.16.1:5173/", "http://172.0.0.1:5173/", "https://discretas-frontend-15yn54gpx-pedrograph.vercel.app"]
 const corsOptions = {
   origin: (origin, callback) => {
     if (whitelist.includes(origin)) {
