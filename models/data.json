@@ -1,0 +1,137 @@
+{
+  "usuarios": [
+    {
+      "id": "1448272450",
+      "nombres": "ITSVAN",
+      "apellidos": "ALVEAR CARABALLO",
+      "tipocontrato": "Medio Tiempo",
+      "genero": "masculino"
+    },
+    {
+      "id": "1916325894",
+      "nombres": "MEYLING KARINA",
+      "apellidos": "CASTRO ARGUMEDO",
+      "tipocontrato": "Catedra",
+      "genero": "femenino"
+    },
+    {
+      "id": "1138746498",
+      "nombres": "VICTOR MANUEL",
+      "apellidos": "FLOREZ MARTINEZ",
+      "tipocontrato": "3/4 Tiempo",
+      "genero": "masculino"
+    },
+    {
+      "id": "1699866492",
+      "nombres": "WILMER",
+      "apellidos": "FLOREZ SANCHEZ",
+      "tipocontrato": "Tiempo Completo",
+      "genero": "masculino"
+    },
+    {
+      "id": "1421222980",
+      "nombres": "JORGE ANDRES",
+      "apellidos": "GAMARRA RODELO",
+      "tipocontrato": "Tiempo Completo",
+      "genero": "masculino"
+    },
+    {
+      "id": "1467433396",
+      "nombres": "LUIS FELIPE",
+      "apellidos": "GUAZO AHUMEDO",
+      "tipocontrato": "Catedra",
+      "genero": "masculino"
+    },
+    {
+      "id": "1151045830",
+      "nombres": "NELSON RAFAEL",
+      "apellidos": "JULIO MARTINEZ",
+      "tipocontrato": "Tiempo Completo",
+      "genero": "masculino"
+    },
+    {
+      "id": "1584635838",
+      "nombres": "RICARDO JOSE",
+      "apellidos": "MARIN HOYOS",
+      "tipocontrato": "Medio Tiempo",
+      "genero": "masculino"
+    },
+    {
+      "id": "1856816445",
+      "nombres": "WILKAR",
+      "apellidos": "MURILLO DIAZ",
+      "tipocontrato": "Tiempo Completo",
+      "genero": "masculino"
+    },
+    {
+      "id": "1858673457",
+      "nombres": "JULIO CESAR ",
+      "apellidos": "OCHOA YEPES",
+      "tipocontrato": "Tiempo Completo",
+      "genero": "masculino"
+    },
+    {
+      "id": "1249564462",
+      "nombres": "RODRIGO JAVIER",
+      "apellidos": "ORTEGA ROMERO",
+      "tipocontrato": "Catedra",
+      "genero": "masculino"
+    },
+    {
+      "id": "1954735553",
+      "nombres": "CHRISTIAN DAVID",
+      "apellidos": "PEARSON GONZALEZ",
+      "tipocontrato": "Tiempo Completo",
+      "genero": "masculino"
+    },
+    {
+      "id": "1433323897",
+      "nombres": "OSCAR CELESTINO",
+      "apellidos": "POVEDA SUAREZ",
+      "tipocontrato": "3/4 Tiempo",
+      "genero": "masculino"
+    },
+    {
+      "id": "1617995228",
+      "nombres": "JULIAN ANDRES",
+      "apellidos": "RODRIGUEZ JULIO ",
+      "tipocontrato": "Medio Tiempo",
+      "genero": "masculino"
+    },
+    {
+      "id": "1149630346",
+      "nombres": "CARLOS AGUSTO",
+      "apellidos": "SAN MARTIN VELASQUEZ",
+      "tipocontrato": "Tiempo Completo",
+      "genero": "masculino"
+    },
+    {
+      "id": "1947298868",
+      "nombres": "JORGE ENRIQUE",
+      "apellidos": "SANCHEZ PRETELT",
+      "tipocontrato": "Catedra",
+      "genero": "masculino"
+    },
+    {
+      "id": "1601436022",
+      "nombres": "JOHAN ENRIQUE",
+      "apellidos": "SUAREZ MARTINEZ",
+      "tipocontrato": "Tiempo Completo",
+      "genero": "masculino"
+    },
+    {
+      "id": "1231015350",
+      "nombres": "ANDRES DAVID",
+      "apellidos": "TORRES PEREZ",
+      "tipocontrato": "Catedra",
+      "genero": "masculino"
+    },
+    {
+      "id": "1887866594",
+      "nombres": "DIEGO ANDRES",
+      "apellidos": "VILLAMIZAR MUNIVE",
+      "tipocontrato": "Medio Tiempo",
+      "genero": "masculino"
+    }
+  ]
+}
