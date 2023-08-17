@@ -29,7 +29,7 @@ app.use(express.json());
 app.use('/products', products);
 app.use('/rating', rating);
 
-const port = 3000;
+const port = process.env.PORT || 3000;
 app.listen(port,
     () => console.log(`La aplicación está
 corriendo en http://localhost:${3000}`)
