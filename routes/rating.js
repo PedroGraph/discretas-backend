@@ -1,11 +1,10 @@
 const express = require('express');
 
-const {getProducts, getProduct} = require('../controllers/Products/consultar');
-const actualizarProducto = require('../controllers/Rating/update');    
+const {updateStars, ratingInfo} = require('../controllers/Rating/update');    
 
 const router= express.Router();
-// router.get('/', getProducts);
-// router.get('/:id', getProduct);
-router.put('/:id', actualizarProducto);
+
+router.post('/product', updateStars);
+router.post('/ratingInfo', ratingInfo);
 
 module.exports=router;

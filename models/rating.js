@@ -8,8 +8,12 @@ const ratingSchema = new mongoose.Schema({
         maxlength: 500,
     },
     stars: {
-        type: Number,
-        required: false,
+        type: String,
+        required: true,
+    },
+    uid:{
+        type: String,
+        required: true
     }
     
 });

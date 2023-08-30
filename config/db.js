@@ -1,6 +1,6 @@
 require ('dotenv').config();
 const mongoose =require('mongoose');
-// const { DB_HOST, DB_USER ,DB_PASSWORD}=process.env;
+const { DB_HOST, DB_USER ,DB_PASSWORD}=process.env;
 const uri= `mongodb+srv://pedro:peter@develomentgraph.gmztlrt.mongodb.net/Discretas?retryWrites=true&w=majority`;
 const conectarDB =async () =>{ 
 try{
