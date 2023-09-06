@@ -21,6 +21,10 @@ const users = new mongoose.Schema({
     uid:{
         type: String,
         required: true,
+    },
+    phone: {
+        type: String,
+        required: false,
     }
     
 }, {

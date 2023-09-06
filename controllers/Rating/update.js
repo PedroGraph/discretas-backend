@@ -26,8 +26,6 @@ const ratingInfo = async (req, res, next) => {
         
         let ratingInfo = {};
 
-        console.log(req.body)
-
         const ratingProduct = await Rating.aggregate([
             {
               $match: { productID: req.body?.productID }
@@ -72,9 +70,6 @@ const ratingInfo = async (req, res, next) => {
             }
           }
 
-          console.log(ratingInfo)
-
-          
           if(!ratingProduct) res.status(404).json({error: "The product that you look for not found"}) 
 
           res.status(200).json(ratingInfo);

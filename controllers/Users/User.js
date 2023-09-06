@@ -48,7 +48,7 @@ const loginUser = async (req, res) => {
 const registerUser = async (req, res) => {
 
     try {
-        const { name, email, password, last_name, uid } = req.body;
+        const { name, email, password, last_name, phone, uid } = req.body;
     
         if (!name || !email || !password) {
           return res.status(400).json({ message: 'Faltan datos' });
@@ -67,6 +67,7 @@ const registerUser = async (req, res) => {
           email,
           last_name,
           password: hashedPassword,
+          phone,
           uid
         });
 
@@ -100,8 +101,28 @@ const getUser = async (req, res) => {
     }
 };
 
+const getUserInfo = async (req, res) => {
+
+    try {
+      const userId = req.body.userId;
+      const user = await User.findOne({uid: userId});
+      if (!user) {
+        return res.status(404).json({ message: 'Usuario no encontrado' });
+      }
+      res.status(200).json({
+        name: user.name,
+        last_name: user.last_name,
+        email: user.email,
+        phone: user.phone
+      });
+    } catch (error) {
+      res.status(500).json({ message: error.message });
+    }
+};
+
 module.exports = {
     loginUser,
     registerUser,
+    getUserInfo,
     getUser
 } ;

@@ -3,7 +3,6 @@ const Rating = require('../../models/rating');
 
 const getProducts = async (req, res, next) => {
     try {
-        
         const products = await dbProducts.find({});
         const ratingPromises = products.map(async (product) => {
             const productid = product._id.toString();
@@ -31,7 +30,6 @@ const getProducts = async (req, res, next) => {
             return product;
         });
         const finalProducts = await Promise.all(ratingPromises);
-        console.log(finalProducts)
         res.status(200).json(products);
     } catch (err) {
         next(err);
