@@ -6,7 +6,7 @@ const updateProducts = require('../controllers/Products/actualizar');
 const eliminarProducto = require('../controllers/Products/eliminar');
 
 const router= express.Router();
-router.get('/', getProducts);
+router.post('/allProducts', getProducts);
 router.get('/:id', getProduct);
 router.post('/', crearProducto);
 router.put('/id', updateProducts);

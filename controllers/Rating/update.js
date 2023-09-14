@@ -64,8 +64,8 @@ const ratingInfo = async (req, res, next) => {
             });
         
             ratingInfo = {
-                productTotalRating: ratingProduct[0].totalRating,
-                averageRating: ratingProduct[0].totalStars / ratingProduct[0].totalRating,
+                productTotalRating: ratingProduct[0]?.totalRating,
+                averageRating: ratingProduct[0].totalStars / ratingProduct[0]?.totalRating,
                 productUserRating: ratingUser[0]?.stars || 0
             }
           }

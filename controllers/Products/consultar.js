@@ -3,7 +3,10 @@ const Rating = require('../../models/rating');
 
 const getProducts = async (req, res, next) => {
     try {
-        const products = await dbProducts.find({});
+        const limit = req.body?.limit ? parseInt(req.body?.limit) : null;
+        const skipCount = req.body?.skip ? parseInt(req.body?.skip) : null;
+ 
+        const products = await dbProducts.find({}).skip(skipCount).limit(limit);
         const ratingPromises = products.map(async (product) => {
             const productid = product._id.toString();
             const ratingCount = await Rating.aggregate([
@@ -26,7 +29,7 @@ const getProducts = async (req, res, next) => {
                     }
                 },
             ]);
-            product.stars = ratingCount[0].total / ratingCount[0].count
+            product.stars = ratingCount[0]?.total / ratingCount[0]?.count
             return product;
         });
         const finalProducts = await Promise.all(ratingPromises);

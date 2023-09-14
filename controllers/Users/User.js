@@ -33,8 +33,6 @@ const loginUser = async (req, res) => {
             return res.status(200).json({ message: 'Es posible que el email y/o contraseña no coincidan' });
         }
 
-        // console.log(user)
-
         const token = generateToken(user._id);
 
         res.status(200).json({ token, userId: user.uid });
