@@ -43,15 +43,14 @@ const loginUser = async (req, res) => {
     }
 };
 
-
 const updateUser = async (req, res, next) => {
   try {
      console.log('test')     
-     const updatedUser = await User.findByIdAndUpdate(req.body.email, req.body, { new: true });
+     const updatedUser = await User.findOneAndUpdate({email: req.body.email}, {$set: req.body}, { new: true });
       if (!updatedUser) {
-          res.status(404).json({ message: "Updated user" });
+          res.status(404).json({ message: "User not registered" });
       } else {
-          res.status(200).json(updatedUser);
+          res.status(200).json({ message: "Updated user" });
       }
   } catch (err) {
       next(err);
