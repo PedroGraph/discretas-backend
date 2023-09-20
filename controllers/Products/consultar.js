@@ -42,9 +42,7 @@ const getProducts = async (req, res, next) => {
 const getProduct = async (req, res, next) => {
     try {
         const targetId = req.params.id;
-        // console.log(targetId)
         const product = await dbProducts.findOne({ _id: targetId});
-        // console.log(JSON.stringify(product));
         res.status(200).json(product);
     } catch (err) {
         next(err);

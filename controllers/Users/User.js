@@ -43,6 +43,21 @@ const loginUser = async (req, res) => {
     }
 };
 
+
+const updateUser = async (req, res, next) => {
+  try {
+     console.log('test')     
+     const updatedUser = await User.findByIdAndUpdate(req.body.email, req.body, { new: true });
+      if (!updatedUser) {
+          res.status(404).json({ message: "Updated user" });
+      } else {
+          res.status(200).json(updatedUser);
+      }
+  } catch (err) {
+      next(err);
+  }
+};
+
 const registerUser = async (req, res) => {
 
     try {
@@ -122,5 +137,6 @@ module.exports = {
     loginUser,
     registerUser,
     getUserInfo,
-    getUser
+    getUser,
+    updateUser
 } ;
