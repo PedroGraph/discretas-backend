@@ -25,6 +25,22 @@ const users = new mongoose.Schema({
     phone: {
         type: String,
         required: false,
+    },
+    address: {
+        type: String,
+        required: false,
+    },
+    idcard: {
+        type: String,
+        required: false,
+    },
+    city: {
+        type: String,
+        required: false,
+    },
+    state: {
+        type: String,
+        required: false,
     }
     
 }, {
