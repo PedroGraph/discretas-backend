@@ -117,11 +117,20 @@ const getUserInfo = async (req, res) => {
 
     try {
       const userId = req.body.userId;
-      const  {password, uid, ...userInfo} = await User.findOne({uid: userId});
+      const user = await User.findOne({uid: userId});
       if (!user) {
         return res.status(404).json({ message: 'Usuario no encontrado' });
       };
-      res.status(200).json(userInfo);
+      res.status(200).json({
+        name: user.name,
+        last_name: user.last_name,
+        email: user.email,
+        phone: user.phone,
+        address: user.address,
+        idcard: user.idcard,
+        city: user.city,
+        state: user.state
+      });
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
