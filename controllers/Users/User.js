@@ -58,19 +58,27 @@ const updateUser = async (req, res, next) => {
 };
 
 const registerUser = async (req, res) => {
-
+    
+    let hashedPassword = '';
+    
     try {
         const { name, email, password, last_name, phone, uid,  photourl} = req.body;
 
         console.log(req.body);
+
+        console.log("step 1");
     
         const verifyUser = await User.findOne({ email });
+
+        console.log("step 2");
 
         if(verifyUser){
             return res.status(200).json({ message: "Correo registrado. Intenta con otro correo."});
         }
-    
-        const hashedPassword = await bcrypt.hash(password, 10);
+
+        console.log("step 3);
+                       
+        if(password) hashedPassword = await bcrypt.hash(password, 10);
     
         const user = new User({
           name,
@@ -81,10 +89,16 @@ const registerUser = async (req, res) => {
           uid,
           photourl
         });
+           
+        console.log("step 4");
 
         await user.save();
 
+         console.log("step 5");
+
         const token = generateToken(user._id);
+
+         console.log("step 6");
 
         res.status(200).json({ token });
         
