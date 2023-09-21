@@ -76,7 +76,7 @@ const registerUser = async (req, res) => {
             return res.status(200).json({ message: "Correo registrado. Intenta con otro correo."});
         }
 
-        console.log("step 3);
+        console.log("step 3");
                        
         if(password) hashedPassword = await bcrypt.hash(password, 10);
     
