@@ -60,12 +60,8 @@ const updateUser = async (req, res, next) => {
 const registerUser = async (req, res) => {
 
     try {
-        const { name, email, password, last_name, phone, uid } = req.body;
+        const { name, email, password, last_name, phone, uid,  photourl} = req.body;
     
-        if (!name || !email || !password) {
-          return res.status(400).json({ message: 'Faltan datos' });
-        }
-
         const verifyUser = await User.findOne({ email });
 
         if(verifyUser){
@@ -80,7 +76,8 @@ const registerUser = async (req, res) => {
           last_name,
           password: hashedPassword,
           phone,
-          uid
+          uid,
+          photourl
         });
 
         await user.save();
