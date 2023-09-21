@@ -129,7 +129,8 @@ const getUserInfo = async (req, res) => {
         address: user.address,
         idcard: user.idcard,
         city: user.city,
-        state: user.state
+        state: user.state,
+        photourl: user.photourl
       });
     } catch (error) {
       res.status(500).json({ message: error.message });
