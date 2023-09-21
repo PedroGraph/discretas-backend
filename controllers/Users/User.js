@@ -121,12 +121,8 @@ const getUserInfo = async (req, res) => {
       if (!user) {
         return res.status(404).json({ message: 'Usuario no encontrado' });
       }
-      res.status(200).json({
-        name: user.name,
-        last_name: user.last_name,
-        email: user.email,
-        phone: user.phone
-      });
+      const {password, uid, ...userInfo} = user;
+      res.status(200).json(userInfo);
     } catch (error) {
       res.status(500).json({ message: error.message });
     }
