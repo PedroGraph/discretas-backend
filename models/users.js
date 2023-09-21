@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 
 const users = new mongoose.Schema({
-
     name: {
         type: String,
         required: true,
@@ -41,8 +40,11 @@ const users = new mongoose.Schema({
     state: {
         type: String,
         required: true,
+    },
+    photourl: {
+        type: String,
+        required: true,
     }
-    
 }, {
     versionKey: false,
 });
