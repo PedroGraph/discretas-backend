@@ -48,7 +48,7 @@ const updateUser = async (req, res, next) => {
      console.log('test')     
      const updatedUser = await User.findOneAndUpdate({email: req.body.email}, {$set: req.body}, { new: true });
       if (!updatedUser) {
-          res.status(404).json({ message: "User not registered" });
+          res.status(404).json({ error: "User not registered" });
       } else {
           res.status(200).json({ message: "Updated user" });
       }
