@@ -24,23 +24,23 @@ const users = new mongoose.Schema({
     },
     phone: {
         type: String,
-        required: false,
+        required: true,
     },
     address: {
         type: String,
-        required: false,
+        required: true,
     },
     idcard: {
         type: String,
-        required: false,
+        required: true,
     },
     city: {
         type: String,
-        required: false,
+        required: true,
     },
     state: {
         type: String,
-        required: false,
+        required: true,
     }
     
 }, {
