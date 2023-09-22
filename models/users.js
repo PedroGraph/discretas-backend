@@ -19,31 +19,31 @@ const users = new mongoose.Schema({
     },
     uid:{
         type: String,
-        required: true,
+        required: false,
     },
     phone: {
         type: String,
-        required: true,
+        required: false,
     },
     address: {
         type: String,
-        required: true,
+        required: false,
     },
     idcard: {
         type: String,
-        required: true,
+        required: false,
     },
     city: {
         type: String,
-        required: true,
+        required: false,
     },
     state: {
         type: String,
-        required: true,
+        required: false,
     },
     photourl: {
         type: String,
-        required: true,
+        required: false,
     }
 }, {
     versionKey: false,
