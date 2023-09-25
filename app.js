@@ -3,6 +3,8 @@ const connect = require('./config/db');
 const products = require('./routes/products');
 const rating = require('./routes/rating');
 const users = require('./routes/login.js');
+const comments = require('./routes/comments.js');
+const orders = require('./routes/orders.js');
 const app = express();
 const cors = require('cors');
 
@@ -29,7 +31,9 @@ app.use(express.json());
 connect(); //database connection
 app.use('/products', products);
 app.use('/rating', rating);
+app.use('/comments', comments);
 app.use('/users', users);
+app.use('/orders', orders);
 
 const port = process.env.PORT || 3000;
 app.listen(port,
