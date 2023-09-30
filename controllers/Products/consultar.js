@@ -49,9 +49,27 @@ const getProduct = async (req, res, next) => {
     }
 };
 
+const getRelatedProduct = async(req, res, next) => {
+
+    const randomQuantity = Math.floor(Math.random() * (6 - 4 + 1)) + 4;
+    try{
+        dbProducts.aggregate([
+            {$sample: 
+                { size: randomQuantity}
+            }
+        ]).then((document) =>{
+           res.status(200).json(document)
+        });
+    }catch(e){
+        console.log(e)
+    }
+
+}
+
 
 
 module.exports = { 
     getProducts,
-    getProduct
+    getProduct,
+    getRelatedProduct
 };
