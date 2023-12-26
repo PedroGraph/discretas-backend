@@ -6,9 +6,8 @@ import cors from 'cors';
 app.enable('trust proxy');
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
-
 mainRoutes(app); // Create all routes for the application
+
 // CORS
 const whitelist = [
   "http://192.168.1.8:5173", "http://172.27.16.1:5173/", "http://172.0.0.1:5173/", "http://localhost:5173/"

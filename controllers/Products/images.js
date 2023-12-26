@@ -1,15 +1,15 @@
+import express from 'express';
 import { Image } from '../../models/database/product.js';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';
 import { verifyImage, saveImage, generateFileName } from '../../utils/images.js';
-
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 // CREATE
 export async function createImage(req, res) {
   try {
     const { body, file } = req;
-    // Convert the import.meta.url to a file path
     const __filename = fileURLToPath(import.meta.url);
-    // Get the directory name from the file path
     const __dirname = dirname(__filename);
 
     if (!file) throw new Error('File not found');
@@ -37,9 +37,11 @@ export async function createImage(req, res) {
 export async function getImagesByProductId(req, res) {
   try {
     const { params } = req;
-    const images = await Image.findAll({ where: { productID: params.productId } });
-    const { imagePath, imageName } = images[0];
-    return res.status(200).sendFile(`${imagePath}/${imageName}`);
+    console.log(__dirname)
+    const images = await Image.findAll({ where: { productID: params.id } });
+    let { imagePath, imageName } = images[0];
+    imagePath = imagePath.replaceAll('/home/user/discretas-backend/', '/home/pedrograph/discretas/discretas-backend/')
+    res.sendFile(`${imagePath}/${imageName}`);
   } catch (error) {
     return res.status(500).json({ error: `Error getting images by product ID: ${error.message}` });
   }
