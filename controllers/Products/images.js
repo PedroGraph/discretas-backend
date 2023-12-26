@@ -38,7 +38,8 @@ export async function getImagesByProductId(req, res) {
   try {
     const { params } = req;
     const images = await Image.findAll({ where: { productID: params.productId } });
-    return res.status(200).json(images);
+    const { imagePath, imageName } = images[0];
+    return res.status(200).sendFile(`${imagePath}/${imageName}`);
   } catch (error) {
     return res.status(500).json({ error: `Error getting images by product ID: ${error.message}` });
   }

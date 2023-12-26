@@ -4,7 +4,7 @@ import { createImage, getImagesByProductId, deleteImage, updateImage,  } from '.
 const router = express.Router();
 
 router.post('/addImage', createImage);
-router.post('/:id', getImagesByProductId);
+router.get('/:id', getImagesByProductId);
 router.delete('/:id', deleteImage);
 router.put('/updateImage', updateImage);
 
