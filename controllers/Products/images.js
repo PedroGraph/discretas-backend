@@ -37,12 +37,11 @@ export async function createImage(req, res) {
 export async function getImagesByProductId(req, res) {
   try {
     const { params } = req;
-    console.log(__dirname)
-    const images = await Image.findAll({ where: { productID: params.id } });
+    const images = await Image.findAll({ where: { id: params.id } });
     let { imagePath, imageName } = images[0];
-    const prueba = path.resolve(__dirname, '..', '..');
-    imagePath = imagePath.replaceAll('/home/user/discretas-backend/', `${prueba}/`)
-    res.sendFile(`${imagePath}/${imageName}`);
+    imagePath = imagePath.split('/');
+    const productFile = path.resolve(__dirname, '..', '..', 'public', 'uploads', imagePath.pop());
+    res.sendFile(`${productFile}/${imageName}`);
   } catch (error) {
     return res.status(500).json({ error: `Error getting images by product ID: ${error.message}` });
   }
