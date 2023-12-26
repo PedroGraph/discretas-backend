@@ -1,0 +1,14 @@
+{
+    "sqltools.connections": [
+        {
+            "pgOptions": {
+                "ssl": true
+            },
+            "previewLimit": 50,
+            "server": "localhost",
+            "driver": "PostgreSQL",
+            "name": "DIscretas",
+            "connectString": "postgres://pedro:42thfa6qozsVFeuRKa923LIkyfHodh0d@dpg-cm3raea1hbls73a927lg-a.oregon-postgres.render.com/testing_5y6e"
+        }
+    ]
+}
