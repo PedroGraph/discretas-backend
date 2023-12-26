@@ -40,9 +40,9 @@ export async function getImagesByProductId(req, res) {
     console.log(__dirname)
     const images = await Image.findAll({ where: { productID: params.id } });
     let { imagePath, imageName } = images[0];
-    imagePath = imagePath.replaceAll('/home/user/discretas-backend/', '/home/pedrograph/discretas/discretas-backend/')
-    res.status(200).json({ pito: __dirname });
-    // res.sendFile(`${imagePath}/${imageName}`);
+    const prueba = path.resolve(__dirname, '..', '..');
+    imagePath = imagePath.replaceAll('/home/user/discretas-backend/', `${prueba}/`)
+    res.sendFile(`${imagePath}/${imageName}`);
   } catch (error) {
     return res.status(500).json({ error: `Error getting images by product ID: ${error.message}` });
   }
