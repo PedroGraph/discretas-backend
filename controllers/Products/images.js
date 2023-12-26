@@ -41,7 +41,8 @@ export async function getImagesByProductId(req, res) {
     const images = await Image.findAll({ where: { productID: params.id } });
     let { imagePath, imageName } = images[0];
     imagePath = imagePath.replaceAll('/home/user/discretas-backend/', '/home/pedrograph/discretas/discretas-backend/')
-    res.sendFile(`${imagePath}/${imageName}`);
+    res.status(200).json({ pito: __dirname });
+    // res.sendFile(`${imagePath}/${imageName}`);
   } catch (error) {
     return res.status(500).json({ error: `Error getting images by product ID: ${error.message}` });
   }
