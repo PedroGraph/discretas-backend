@@ -12,12 +12,7 @@ export async function createProduct(req, res) {
 
 export async function getAllProducts(req, res) {
   try {
-    const products = await Product.findAll({
-      include: [{
-        model: Image,
-        attributes: ['id'],
-      }],
-    });
+    const products = await Product.findAll();
     res.status(200).json(products);
   } catch (error) {
     console.error(error);
