@@ -1,4 +1,4 @@
-import { Product } from '../../models/database/product.js'; 
+import { Product, Image } from '../../models/database/product.js'; 
 export async function createProduct(req, res) {
   try {
     let { body } = req;
@@ -12,7 +12,13 @@ export async function createProduct(req, res) {
 
 export async function getAllProducts(req, res) {
   try {
-    const products = await Product.findAll();
+    const products = await Product.findAll({
+      include: [{
+        model: Image,
+        attributes: ['id', 'imageName', 'imagePath'],
+      }],
+    });
+
     res.status(200).json(products);
   } catch (error) {
     console.error(error);
