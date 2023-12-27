@@ -26,8 +26,7 @@ export async function getAllProducts(req, res) {
 }
 
 export async function getProductById(req, res) {
-  const productId = req.params.productId;
-
+  const productId = req.params.id;
   try {
     const product = await Product.findByPk(productId, { include: Image });
     if (product) {
