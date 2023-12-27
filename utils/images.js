@@ -12,9 +12,15 @@ async function verifyImage(buffer) {
 }
 
 function generateFileName(nombredelproducto, originalname) {
+    const generateRandomNumber = () => {
+        const number = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
+        const letters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        const randomLetter = letters.charAt(Math.floor(Math.random() * letters.length));
+        return `${number}${randomLetter}`;
+    }
     const fechaActual = new Date().toLocaleDateString().replaceAll('/', '-');
     const extension = originalname.split('.');
-    return `${nombredelproducto}_${fechaActual}.${extension[1]}`;
+    return `${nombredelproducto}_${fechaActual}_${generateRandomNumber()}.${extension[1]}`;
 }
 
 async function saveImage(buffer, rutaDirectorio, nombreArchivo) {
