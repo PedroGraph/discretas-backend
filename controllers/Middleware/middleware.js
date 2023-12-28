@@ -11,7 +11,7 @@ const verifyToken = (token) => {
 };
 
 const authMiddleware = (req, res, next) => {
-  const authHeader = req.headers['authorization'];
+  const authHeader = req.headers['Authorization'];
 
   if (!authHeader) {
     return res.status(401).json({ message: 'No se proporcionó el token' });

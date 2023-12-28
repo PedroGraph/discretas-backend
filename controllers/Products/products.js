@@ -1,11 +1,18 @@
-import { Product, Image } from '../../models/database/product.js'; 
+import { Product, Image } from '../../models/database/product.js';
+import logger from '../../logs/log.js';
 export async function createProduct(req, res) {
   try {
     let { body } = req;
     const newProduct = await Product.create(body);
-    res.status(201).json(newProduct);
+    logger.info('Se ha creado un nuevo producto');
+
+    if (process.env_NODE_ENV === 'TEST') {
+      res.status(201).json(newProduct);
+    }
+
+    res.status(201).json({ info: "Producto creado" });
   } catch (error) {
-    console.error(error);
+    logger.error('Error al crear el nuevo producto');
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 }
@@ -18,9 +25,10 @@ export async function getAllProducts(req, res) {
         attributes: ['id'],
       }],
     });
+    logger.info('Se han obtenido todos los Productos');
     res.status(200).json(products);
   } catch (error) {
-    console.error(error);
+    logger.error('Error al obtener todos los Productos');
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 }
@@ -30,12 +38,14 @@ export async function getProductById(req, res) {
   try {
     const product = await Product.findByPk(productId, { include: Image });
     if (product) {
+      logger.info(`Se ha obtenido el Producto con el id ${productId}`);
       res.status(200).json(product);
     } else {
+      logger.warn(`Error al obtener el Producto con el id ${productId}`);
       res.status(404).json({ error: 'Producto no encontrado' });
     }
   } catch (error) {
-    console.error(error);
+    logger.error(`Error al obtener el Producto con el id ${productId} - Server error`);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 }
@@ -51,12 +61,17 @@ export async function updateProduct(req, res) {
     });
 
     if (rowsUpdated > 0) {
-      res.status(200).json(updatedProduct);
+      logger.info(`Se ha actualizado el Producto con el id ${productId}`);
+      if (process.env.NODE_ENV === 'TEST') {
+        res.status(200).json(updatedProduct);
+      }
+      res.status(200).json({ info: 'Producto actualizado' });
     } else {
+      logger.warn(`Error al actualizar el Producto con el id ${productId}`);
       res.status(404).json({ error: 'Producto no encontrado' });
     }
   } catch (error) {
-    console.error(error);
+    logger.error(`Error al actualizar el Producto con el id ${productId} - Server error`);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 }
@@ -70,12 +85,14 @@ export async function deleteProduct(req, res) {
     });
 
     if (deletedProduct) {
-      res.status(204).send();
+      logger.info(`Se ha eliminado el Producto con el id ${productId}`);
+      res.status(204).json({ info: 'Producto eliminado' });
     } else {
+      logger.warn(`Error al eliminar el Producto con el id ${productId}`);
       res.status(404).json({ error: 'Producto no encontrado' });
     }
   } catch (error) {
-    console.error(error);
+    logger.error(`Error al eliminar el Producto con el id ${productId} - Server error`);
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 }
