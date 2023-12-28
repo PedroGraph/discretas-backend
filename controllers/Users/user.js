@@ -2,7 +2,7 @@ import { User } from '../../models/database/user.js';
 import bcrypt from 'bcrypt';
 import { generateToken } from '../Middleware/userMiddleware.js';
 import {  addRevokedToken } from '../Token/revokedToken.js';
-import logger from '../../logs/log.js';
+import logger from '../../logCreator/log.js';
 
 export const createUser = async (req, res) => {
   try {

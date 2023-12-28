@@ -1,4 +1,4 @@
-import logger from '../../logs/log.js';
+import logger from '../../logCreator/log.js';
 import { Image } from '../../models/database/product.js';
 import { fileURLToPath } from 'url';
 import path, { dirname } from 'path';

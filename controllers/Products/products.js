@@ -1,5 +1,5 @@
 import { Product, Image } from '../../models/database/product.js';
-import logger from '../../logs/log.js';
+import logger from '../../logCreator/log.js';
 export async function createProduct(req, res) {
   try {
     let { body } = req;
