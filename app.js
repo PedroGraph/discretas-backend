@@ -33,7 +33,7 @@ const corsOptions = {
 
 
 
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 
 // Configuración del servidor y escucha del puerto
 if (!import.meta.main) {
