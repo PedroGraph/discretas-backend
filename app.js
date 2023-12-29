@@ -16,20 +16,20 @@ app.use(express.json());
 mainRoutes(app);
 
 // Configuración de CORS
-// const whitelist = [
-//   "http://localhost:3000/"
-// ];
+const whitelist = [
+  "http://localhost:3000/"
+];
 
-// const corsOptions = {
-//   origin: (origin, callback) => {
-//     if (whitelist.includes(origin)) {
-//       callback(null, true);
-//     } else {
-//       console.log('Cors error:');
-//       callback(new Error("Error de Cors"));
-//     }
-//   },
-// };
+const corsOptions = {
+  origin: (origin, callback) => {
+    if (whitelist.includes(origin)) {
+      callback(null, true);
+    } else {
+      console.log('Cors error:');
+      callback(new Error("Error de Cors"));
+    }
+  },
+};
 
 
 
