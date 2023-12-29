@@ -12,10 +12,6 @@ syncDatabase();
 app.enable('trust proxy');
 app.use(express.json());
 
-// Configuración de rutas principales
-mainRoutes(app);
-
-// Configuración de CORS
 const whitelist = [
   "http://localhost:3000", "https://discretasseduccion.vercel.app"
 ];
@@ -33,6 +29,12 @@ const corsOptions = {
 
 
 app.use(cors(corsOptions));
+
+// Configuración de rutas principales
+mainRoutes(app);
+
+// Configuración de CORS
+
 
 // Configuración del servidor y escucha del puerto
 if (!import.meta.main) {
