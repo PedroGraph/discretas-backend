@@ -16,11 +16,6 @@ const whitelist = [
   "http://localhost:3000", "https://discretasseduccion.vercel.app"
 ];
 
-const whitelist = [
-  "http://localhost:3000",
-  "https://discretasseduccion.vercel.app"
-];
-
 const corsOptions = {
   origin: (origin, callback) => {
     if (!origin || whitelist.includes(origin)) {
