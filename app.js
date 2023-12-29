@@ -16,6 +16,11 @@ const whitelist = [
   "http://localhost:3000", "https://discretasseduccion.vercel.app"
 ];
 
+const whitelist = [
+  "http://localhost:3000",
+  "https://discretasseduccion.vercel.app"
+];
+
 const corsOptions = {
   origin: (origin, callback) => {
     if (!origin || whitelist.includes(origin)) {
@@ -25,10 +30,13 @@ const corsOptions = {
       callback(new Error("Error de CORS"));
     }
   },
+  credentials: true, // Agrega esta línea para permitir el envío de cookies
 };
 
+app.use(cors(corsOptions));
 
-app.use(cors({credentials: true, corsOptions}));
+
+app.use(cors(corsOptions));
 
 // Configuración de rutas principales
 mainRoutes(app);
