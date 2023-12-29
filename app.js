@@ -17,7 +17,7 @@ mainRoutes(app);
 
 // Configuración de CORS
 const whitelist = [
-  "http://localhost:3000"
+  "http://localhost:3000", "https://discretasseduccion.vercel.app"
 ];
 
 const corsOptions = {
