@@ -28,7 +28,7 @@ const corsOptions = {
 };
 
 
-app.use(cors(corsOptions));
+app.use(cors({credentials: true, corsOptions}));
 
 // Configuración de rutas principales
 mainRoutes(app);
