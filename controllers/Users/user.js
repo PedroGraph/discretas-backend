@@ -127,7 +127,7 @@ export const login = async (req, res) => {
     res.cookie('sessionId', token, {
       maxAge: 7 * 24 * 60 * 60 * 1000, 
       httpOnly: true, 
-      secure: process.env.NODE_ENV === 'PROD' ? true : false, 
+      secure: process.env.NODE_ENV === 'PROD' ? false : true, 
     });
 
     logger.info('Login successful: ', email);
