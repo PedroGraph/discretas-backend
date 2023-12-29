@@ -17,7 +17,7 @@ mainRoutes(app);
 
 // Configuración de CORS
 const whitelist = [
-  "http://localhost:3000/"
+  "http://localhost:3000"
 ];
 
 const corsOptions = {
@@ -25,11 +25,12 @@ const corsOptions = {
     if (whitelist.includes(origin)) {
       callback(null, true);
     } else {
-      console.log('Cors error:');
-      callback(new Error("Error de Cors"));
+      console.log('Error de CORS: La solicitud desde', origin, 'no está permitida');
+      callback(new Error("Error de CORS"));
     }
   },
 };
+
 
 app.use(cors(corsOptions));
 
