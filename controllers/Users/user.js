@@ -131,9 +131,8 @@ export const login = async (req, res) => {
     });
 
     logger.info('Login successful: ', email);
-
-    // Enviar la respuesta con el token y cualquier otra información que desees
-    res.json({ user, token });
+    res.json({ token });
+    
   } catch (error) {
     console.error('Error to login:', error);
     res.status(500).json({ message: 'Error en el servidor' });
