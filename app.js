@@ -31,8 +31,6 @@ const corsOptions = {
   },
 };
 
-
-
 app.use(cors(corsOptions));
 
 // Configuración del servidor y escucha del puerto
