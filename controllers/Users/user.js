@@ -108,6 +108,8 @@ export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
 
+    console.log(req.cookies)
+
     const user = await User.findOne({ where: { email } });
 
     if (!user) {
