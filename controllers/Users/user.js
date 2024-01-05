@@ -165,6 +165,7 @@ export const loginWithGoogle = async (req, res) => {
     });
 
     const tokenId = req.body.idToken;
+    console.log(tokenId)
     const decodedToken = await admin.auth().verifyIdToken(tokenId);
     const uid = decodedToken.uid;
 
