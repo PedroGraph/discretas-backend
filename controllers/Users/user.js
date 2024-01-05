@@ -4,7 +4,7 @@ import { generateToken } from '../Middleware/userMiddleware.js';
 import {  addRevokedToken } from '../Token/revokedToken.js';
 import logger from '../../logCreator/log.js';
 import admin from 'firebase-admin'
-import serviceAccount from '../../serviceAccountKey.json'
+import serviceAccount from '../../serviceAccountKey.json' assert { type: 'json' };
 
 export const createUser = async (req, res) => {
   try {
@@ -167,7 +167,7 @@ export const loginWithGoogle = async (req, res) => {
     const tokenId = req.body.idToken;
     const decodedToken = await admin.auth().verifyIdToken(tokenId);
     const uid = decodedToken.uid;
-    
+
     const token = generateToken(uid);
 
     res.cookie('sessionId', token, {
