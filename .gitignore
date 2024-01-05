@@ -1,3 +1,6 @@
+#Google files
+serviceAccountKey.json
+
 # Logs
 logs
 *.log
