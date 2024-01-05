@@ -1,7 +1,7 @@
 
 import express from 'express';
 import {authenticateUser} from '../controllers/Middleware/userMiddleware.js';
-import {createUser, login, logout, getUserById, getAllUsers, updateUserById, deleteUserById} from '../controllers/Users/user.js';
+import {createUser, login, loginWithGoogle, logout, getUserById, getAllUsers, updateUserById, deleteUserById} from '../controllers/Users/user.js';
 
 const router = express.Router();
 
@@ -14,6 +14,7 @@ router.delete('/deleteuser/:id', authenticateUser, deleteUserById);
 
 // Ruta de inicio de sesión
 router.post('/login', login);
+router.post('/googleLogin', loginWithGoogle);
 router.post('/logout', logout);
 
 export default router;

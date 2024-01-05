@@ -3,6 +3,8 @@ import bcrypt from 'bcrypt';
 import { generateToken } from '../Middleware/userMiddleware.js';
 import {  addRevokedToken } from '../Token/revokedToken.js';
 import logger from '../../logCreator/log.js';
+import admin from 'firebase-admin'
+import serviceAccount from '../../serviceAccountKey.json'
 
 export const createUser = async (req, res) => {
   try {
@@ -153,5 +155,33 @@ export const logout = async (req, res) => {
   }catch(error){
     logger.error('Error to logout:', error);
     res.status(500).json({ message: 'Error en el servidor' });
+  }
+}
+
+export const loginWithGoogle = async (req, res) => {
+  try {
+    admin.initializeApp({
+      credential: admin.credential.cert(serviceAccount),
+    });
+
+    const tokenId = req.body.idToken;
+    const decodedToken = await admin.auth().verifyIdToken(tokenId);
+    const uid = decodedToken.uid;
+    
+    const token = generateToken(uid);
+
+    res.cookie('sessionId', token, {
+      maxAge: 7 * 24 * 60 * 60 * 1000, 
+      httpOnly: true, 
+      secure: true, 
+      sameSite: 'None', // Para permitir el envío en solicitudes cruzadas
+    });
+
+    logger.info('Login successful: ', uid);
+    res.json({ token });
+
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, error: 'Error en la autenticación de Google' });
   }
 }
