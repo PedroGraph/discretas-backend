@@ -1,9 +1,11 @@
 import { User } from '../../models/database/user.js';
 import bcrypt from 'bcrypt';
 import { generateToken } from '../Middleware/userMiddleware.js';
-import { addRevokedToken } from '../Token/revokedToken.js';
+import {  addRevokedToken } from '../Token/revokedToken.js';
 import logger from '../../logCreator/log.js';
 import admin from 'firebase-admin'
+import serviceAccount from '../../serviceAccountKey.json' assert { type: 'json' };
+admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
 
 export const createUser = async (req, res) => {
   try {
@@ -22,10 +24,10 @@ export const createUser = async (req, res) => {
     });
     const userInfo = user.dataValues;
 
-    if (process.env.NODE_ENV === 'TEST') res.status(201).json({ userInfo, token: generateToken(user) });
-
+    if(process.env.NODE_ENV === 'TEST') res.status(201).json({ userInfo, token: generateToken(user) });
+    
     res.status(201).json({ info: 'User created' });
-
+    
   } catch (error) {
     logger.error('Error to create user:', error);
     res.status(500).json({ message: 'Error en el servidor' });
@@ -128,9 +130,9 @@ export const login = async (req, res) => {
     const token = generateToken(user);
 
     res.cookie('sessionId', token, {
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-      secure: true,
+      maxAge: 7 * 24 * 60 * 60 * 1000, 
+      httpOnly: true, 
+      secure: true, 
       sameSite: 'None', // Para permitir el envío en solicitudes cruzadas
     });
 
@@ -144,14 +146,14 @@ export const login = async (req, res) => {
 };
 
 export const logout = async (req, res) => {
-  try {
+  try{
     const token = req.cookies.sessionId;
     const isTokenRevoked = await findRevokedToken(token);
     if (!isTokenRevoked) await addRevokedToken(token);
     res.clearCookie('sessionId');
     logger.info('Logout successful: ', req.cookies.sessionId);
     res.status(200).json({ message: 'Logout exitoso' });
-  } catch (error) {
+  }catch(error){
     logger.error('Error to logout:', error);
     res.status(500).json({ message: 'Error en el servidor' });
   }
@@ -160,32 +162,17 @@ export const logout = async (req, res) => {
 export const loginWithGoogle = async (req, res) => {
   try {
 
-    const serviceAccount = googleServiceAccount();
-
-    console.log(serviceAccount, "serviceAccount")
-
-    admin.initializeApp({
-      credential: admin.credential.cert(serviceAccount),
-    });
-
     const tokenId = req.body.idToken;
-
-    console.log(tokenId, "tokenId")
-    console.log(tokenId)
     const decodedToken = await admin.auth().verifyIdToken(tokenId);
     const uid = decodedToken.uid;
 
-    console.log(uid, "uid")
-
     const token = generateToken(uid);
 
-    console.log(token, "token");
-
     res.cookie('sessionId', token, {
-      maxAge: 7 * 24 * 60 * 60 * 1000,
-      httpOnly: true,
-      secure: true,
-      sameSite: 'None', // Para permitir el envío en solicitudes cruzadas
+      maxAge: 7 * 24 * 60 * 60 * 1000, 
+      httpOnly: true, 
+      secure: true, 
+      sameSite: 'None', 
     });
 
     logger.info('Login successful: ', uid);
@@ -194,36 +181,5 @@ export const loginWithGoogle = async (req, res) => {
   } catch (error) {
     console.error(error);
     res.status(500).json({ success: false, error: 'Error en la autenticación de Google' });
-  }
-}
-
-
-const googleServiceAccount = () => {
-  const {
-    GOOGLE_TYPE,
-    GOOGLE_PROJECT_ID,
-    GOOGLE_PRIVATE_KEY_ID,
-    GOOGLE_PRIVATE_KEY,
-    GOOGLE_CLIENT_EMAIL,
-    GOOGLE_CLIENT_ID,
-    GOOGLE_AUTH_URI,
-    GOOGLE_TOKEN_URI,
-    GOOGLE_AUTH_PROVIDER_X509_CERT_URL,
-    GOOGLE_CLIENT_X509_CERT_URL,
-    GOOGLE_UNIVERSE_DOMAIN
-  } = proccess.env
-
-  return {
-    GOOGLE_TYPE,
-    GOOGLE_PROJECT_ID,
-    GOOGLE_PRIVATE_KEY_ID,
-    GOOGLE_PRIVATE_KEY,
-    GOOGLE_CLIENT_EMAIL,
-    GOOGLE_CLIENT_ID,
-    GOOGLE_AUTH_URI,
-    GOOGLE_TOKEN_URI,
-    GOOGLE_AUTH_PROVIDER_X509_CERT_URL,
-    GOOGLE_CLIENT_X509_CERT_URL,
-    GOOGLE_UNIVERSE_DOMAIN
   }
 }
