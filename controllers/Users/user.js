@@ -162,17 +162,24 @@ export const loginWithGoogle = async (req, res) => {
 
     const serviceAccount = googleServiceAccount();
 
+    console.log(serviceAccount, "serviceAccount")
+
     admin.initializeApp({
       credential: admin.credential.cert(serviceAccount),
     });
 
-    //AÑADIR LA INMFO QUE TIENE SERVICE ACCOUNT EN VARIABLES DE ENTORNO PARA QUE FUNCIONE EN RENDER
     const tokenId = req.body.idToken;
+
+    console.log(tokenId, "tokenId")
     console.log(tokenId)
     const decodedToken = await admin.auth().verifyIdToken(tokenId);
     const uid = decodedToken.uid;
 
+    console.log(uid, "uid")
+
     const token = generateToken(uid);
+
+    console.log(token, "token");
 
     res.cookie('sessionId', token, {
       maxAge: 7 * 24 * 60 * 60 * 1000,
