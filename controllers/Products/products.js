@@ -1,98 +1,87 @@
-import { Product, Image } from '../../models/database/product.js';
 import logger from '../../logCreator/log.js';
-export async function createProduct(req, res) {
-  try {
-    let { body } = req;
-    const newProduct = await Product.create(body);
-    logger.info('Se ha creado un nuevo producto');
 
-    if (process.env_NODE_ENV === 'TEST') {
-      res.status(201).json(newProduct);
+export class ProductController {
+  constructor( productModel ) {
+    this.productModel = productModel;
+  }
+
+  createProduct = async (req, res) => {
+    try {
+      let { body } = req;
+      const newProduct = await this.productModel.save(body);
+      logger.info('A new product has been created');
+      res.status(201).json({ info: newProduct });
+    } catch (error) {
+      logger.error('Has ocurred an error creating a new product');
+      res.status(500).json({ error: `Error server: the product could not be created. Error message: ${error}` });
     }
-
-    res.status(201).json({ info: "Producto creado" });
-  } catch (error) {
-    logger.error('Error al crear el nuevo producto');
-    res.status(500).json({ error: 'Error interno del servidor' });
   }
-}
 
-export async function getAllProducts(req, res) {
-  try {
-    const products = await Product.findAll({
-      include: [{
-        model: Image,
-        attributes: ['id'],
-      }],
-    });
-    logger.info('Se han obtenido todos los Productos');
-    res.status(200).json(products);
-  } catch (error) {
-    logger.error('Error al obtener todos los Productos');
-    res.status(500).json({ error: 'Error interno del servidor' });
-  }
-}
-
-export async function getProductById(req, res) {
-  const productId = req.params.id;
-  try {
-    const product = await Product.findByPk(productId, { include: Image });
-    if (product) {
-      logger.info(`Se ha obtenido el Producto con el id ${productId}`);
-      res.status(200).json(product);
-    } else {
-      logger.warn(`Error al obtener el Producto con el id ${productId}`);
-      res.status(404).json({ error: 'Producto no encontrado' });
+  getAllProducts = async (req, res) => {
+    try {
+      const products = await this.productModel.getAll();
+      logger.info('Items obtained successfully');
+      res.status(200).json(products);
+    } catch (error) {
+      logger.error('Error obtaining items - Server error');
+      res.status(500).json({ error: `Error server: the items could not be obtained. Error message: ${error}` });
     }
-  } catch (error) {
-    logger.error(`Error al obtener el Producto con el id ${productId} - Server error`);
-    res.status(500).json({ error: 'Error interno del servidor' });
   }
-}
 
-export async function updateProduct(req, res) {
-  const productId = req.params.productId;
-  const updatedData = req.body;
-
-  try {
-    const [rowsUpdated, [updatedProduct]] = await Product.update(updatedData, {
-      where: { id: productId },
-      returning: true,
-    });
-
-    if (rowsUpdated > 0) {
-      logger.info(`Se ha actualizado el Producto con el id ${productId}`);
-      if (process.env.NODE_ENV === 'TEST') {
-        res.status(200).json(updatedProduct);
+  getProductById = async (req, res) => {
+    const productId = req.params.id;
+    try {
+      const product = await this.productModel.getById(productId);
+      if (product) {
+        logger.info(`Product obtained successfully - ${productId}`);
+        res.status(200).json(product);
       }
-      res.status(200).json({ info: 'Producto actualizado' });
-    } else {
-      logger.warn(`Error al actualizar el Producto con el id ${productId}`);
-      res.status(404).json({ error: 'Producto no encontrado' });
+      logger.warn(`Product not found ${productId}`);
+      res.status(404).json({ error: 'Product not found' });
+
+    } catch (error) {
+      logger.error(`Error obtaining product ${productId} - Server error`);
+      res.status(500).json({ error: `Error server: the product could not be obtained. Error message: ${error}` });
     }
-  } catch (error) {
-    logger.error(`Error al actualizar el Producto con el id ${productId} - Server error`);
-    res.status(500).json({ error: 'Error interno del servidor' });
   }
-}
 
-export async function deleteProduct(req, res) {
-  const productId = req.params.productId;
+  updateProduct = async (req, res) => {
+    const productId = req.params.id;
+    const updatedData = req.body;
 
-  try {
-    const deletedProduct = await Product.destroy({
-      where: { id: productId },
-    });
+    try {
+      const updatedProduct = await this.productModel.update({ updatedData, productId });
 
-    if (deletedProduct) {
-      logger.info(`Se ha eliminado el Producto con el id ${productId}`);
-      res.status(204).json({ info: 'Producto eliminado' });
-    } else {
-      logger.warn(`Error al eliminar el Producto con el id ${productId}`);
-      res.status(404).json({ error: 'Producto no encontrado' });
+      if (updatedProduct) {
+        logger.info(`Product with id ${productId} has been updated successfully`);
+        res.status(200).json({ info: updatedProduct });
+      }
+
+      logger.warn(`Product with id ${productId} not found ${productId}`);
+      res.status(404).json({ error: 'Product not found' });
+
+    } catch (error) {
+      logger.error(`Error updating product ${productId} - Server error`);
+      res.status(500).json({ error: `Error server: the product could not be updated. Error message. ${error}` });
     }
-  } catch (error) {
-    logger.error(`Error al eliminar el Producto con el id ${productId} - Server error`);
-    res.status(500).json({ error: 'Error interno del servidor' });
+  }
+
+  deleteProduct = async (req, res) => {
+    const productId = parseInt(req.params.productId);
+    try {
+      const deletedProduct = await this.productModel.delete(productId);
+
+      if (deletedProduct) {
+        logger.info(`Product with id ${productId} has been deleted`);
+        res.status(204).json({ info: 'Product deleted' });
+      }
+
+      logger.warn(`Product with id ${productId} not found `);
+      res.status(404).json({ error: 'Product not found' });
+
+    } catch (error) {
+      logger.error(`Error deleting product ${productId} - Server error`);
+      res.status(500).json({ error: `Error server: the product could not be deleted. Error message: ${error}` });
+    }
   }
 }

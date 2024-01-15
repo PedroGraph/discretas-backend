@@ -1,20 +1,26 @@
 
-import express from 'express';
+import {Router} from 'express';
 import {authenticateUser} from '../controllers/Middleware/userMiddleware.js';
-import {createUser, login, loginWithGoogle, logout, getUserById, getAllUsers, updateUserById, deleteUserById} from '../controllers/Users/user.js';
+import { UserController } from '../controllers/Users/user.js';
 
-const router = express.Router();
+export const creatingUserRouter = ({ userModel }) => {
 
-// Rutas CRUD
-router.post('/create', createUser);
-router.get('/all', authenticateUser, getAllUsers);
-router.get('/getuser/:id', authenticateUser, getUserById);
-router.put('/updateuser/:id', authenticateUser, updateUserById);
-router.delete('/deleteuser/:id', authenticateUser, deleteUserById);
+    const userController = new UserController(userModel);
+    const userRouter = Router();
+    // Rutas CRUD
+    userRouter.post('/create', userController.createUser);
+    userRouter.get('/all', userController.getAllUsers);
+    userRouter.get('/getuser/:id', userController.getUserById);
+    userRouter.put('/updateuser/:id',  userController.updateUserById);
+    userRouter.delete('/deleteuser/:id',  userController.deleteUserById);
 
-// Ruta de inicio de sesión
-router.post('/login', login);
-router.post('/googleLogin', loginWithGoogle);
-router.post('/logout', logout);
+    // Ruta de inicio y cierre de sesión
+    userRouter.post('/login', userController.login);
+    userRouter.post('/googleLogin', userController.loginWithGoogle);
+    userRouter.post('/logout', userController.logout);
 
-export default router;
+    // Ruta para la actualización de la contrasenya
+
+    return userRouter;
+
+}

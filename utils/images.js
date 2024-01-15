@@ -24,7 +24,6 @@ function generateFileName(nombredelproducto, originalname) {
 }
 
 async function saveImage(buffer, rutaDirectorio, nombreArchivo) {
-    console.log(rutaDirectorio)
     await fs.mkdir(rutaDirectorio, { recursive: true }, (err) => {
         if (err) throw err;
     });

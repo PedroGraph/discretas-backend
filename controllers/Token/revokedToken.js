@@ -1,4 +1,4 @@
-import { RevokedToken } from '../../models/database/revokedToken.js'; // Ajusta la importación según tu estructura
+import { RevokedToken } from '../../models/postgres/revokedToken.js'; // Ajusta la importación según tu estructura
 
 const addRevokedToken = async (token) => {
     try {
