@@ -62,8 +62,17 @@ export class ImageController {
     const imageId = req.params.id;
     try {
       const image = await this.imageModel.getById(imageId);
-      logger.info('Item obtained successfully');
-      res.status(200).json(image);
+      console.log(image)
+      let { imagePath, imageName } = image.dataValues;
+      imagePath = imagePath.split('/');
+      const productFile = path.resolve(__dirname, '..', '..', 'public', 'uploads', imagePath.pop());
+      if(!productFile) {
+        logger.warn(`Product with ID ${imageId} not found`);
+        throw new Error(`Product with ID ${imageId} not found`);
+      }else{
+        logger.info(`Product with ID ${imageId} found`);
+        res.sendFile(`${productFile}/${imageName}`);
+      }
     } catch (error) {
       logger.error('Error obtaining item - Server error');
       res.status(500).json({ error: `Error server: the item could not be obtained. Error message: ${error}` });
