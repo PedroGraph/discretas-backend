@@ -62,7 +62,6 @@ export class ImageController {
     const imageId = req.params.id;
     try {
       const image = await this.imageModel.getById(imageId);
-      console.log(image)
       let { imagePath, imageName } = image.dataValues;
       imagePath = imagePath.split('/');
       const productFile = path.resolve(__dirname, '..', '..', 'public', 'uploads', imagePath.pop());

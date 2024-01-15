@@ -34,11 +34,10 @@ export class ProductController {
       const product = await this.productModel.getById(productId);
       if (product) {
         logger.info(`Product obtained successfully - ${productId}`);
-        res.status(200).json(product);
+        return res.status(200).json(product);
       }
       logger.warn(`Product not found ${productId}`);
-      res.status(404).json({ error: 'Product not found' });
-
+      return res.status(404).json({ error: 'Product not found' });
     } catch (error) {
       logger.error(`Error obtaining product ${productId} - Server error`);
       res.status(500).json({ error: `Error server: the product could not be obtained. Error message: ${error}` });
