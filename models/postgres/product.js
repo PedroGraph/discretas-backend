@@ -1,26 +1,12 @@
 import { DataTypes } from 'sequelize';
+import { v4 as uuidv4 } from 'uuid';
 import sequelize from '../../config/database.js';
-
-export const Image = sequelize.define('image', {
-  id:{
-    type: DataTypes.INTEGER,
-    primaryKey: true,
-    autoIncrement: true,
-  },
-  imageName: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-  imagePath: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
-});
-
+import { Image } from './image.js';
 
 export const Product = sequelize.define('products', {
   id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.UUID,
+    defaultValue: () => uuidv4(),
     primaryKey: true,
     autoIncrement: true,
   },
@@ -60,121 +46,88 @@ Product.hasMany(Image, { foreignKey: 'productID', sourceKey: 'id' });
 Image.belongsTo(Product, { foreignKey: 'productID', targetKey: 'id' });
 
 export class ProductModel {
-
-  save = async (product) => {
-    try{
-      const newProduct = await Product.create(product);
-      if(newProduct) return newProduct.dataValues;
-      else return [];
-    }catch(error){
-      console.log(error);
-    }
-  }
-
-  getAll = async () => {
-    try{
-      const getAllProducts = await Product.findAll({
-        include: [{
-          model: Image,
-          attributes: ['id'],
-        }],
+  // Crear un nuevo producto con una imagen
+  createProduct = async (productData, imageData) => {
+    try {
+      // Crea el producto
+      const newProduct = await Product.create(productData);
+      // Asocia la imagen al producto
+      const newImage = await Image.create({
+        ...imageData,
+        productId: parseInt(newProduct.dataValues.id),
       });
-      if(getAllProducts) return getAllProducts;
-      return [];
-    }catch(error){
+
+      return {
+        product: newProduct,
+        image: newImage,
+      };
+    } catch (error) {
+      console.log(error,);
+    }
+  }
+
+  // Obtener todos los productos con sus imágenes
+  getAllProducts = async () => {
+    try {
+      const allProducts = await Product.findAll({
+        include: [{ model: Image }],
+      });
+
+      return allProducts;
+    } catch (error) {
       console.log(error);
     }
   }
 
-  getById = async (productId) => {
-    try{
-      const product = await Product.findByPk(productId, { include: Image });
-      if(product) return product;
-      return [];
-    }catch(error){
+  // Obtener un producto por su ID con su imagen
+  getProductById = async (productId) => {
+    try {
+      const product = await Product.findByPk(productId, {
+        include: [{ model: Image }],
+      });
+
+      return product;
+    } catch (error) {
       console.log(error);
     }
   }
 
-  update = async ({updatedData, productId}) => {
-    try{
-      const  [rowsUpdated, [updatedProduct]] = await Product.update(updatedData, {
+  // Actualizar un producto por su ID
+  updateProductById = async ({productId, updatedData}) => {
+    try {
+
+      const [rowsUpdated, [updatedProduct]] = await Product.update(updatedData, {
         where: { id: productId },
         returning: true,
       });
-      if(rowsUpdated > 0) return updatedProduct;
-      else return [];
-    }catch(error){
+
+      if (rowsUpdated > 0) {
+        return updatedProduct;
+      } else {
+        console.log('No se pudo actualizar el producto.');
+        return null;
+      }
+    } catch (error) {
       console.log(error);
     }
   }
 
-  delete = async (productId) => {
-    try{
-      const product = await Product.destroy({
+  // Eliminar un producto por su ID
+  deleteProductById = async (productId) => {
+    try {
+      const deletedProduct = await Product.destroy({
         where: { id: productId },
       });
-      if(product) return product;
-      else return [];
-    }catch(error){
-      // console.log(error);
+
+      if (deletedProduct > 0) {
+        return { message: 'Producto eliminado exitosamente.' };
+      } else {
+        console.log('No se pudo eliminar el producto.');
+        return null;
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
 }
 
-export class ImageModel {
-  save = async (image) => {
-    try{
-      const newImage = await Image.create(image);
-      if(newImage) return newImage;
-      else return [];
-    }catch(error){
-      console.log(error);
-    }
-  }
-
-  getAll = async () => {
-    try{
-      const allImages = await Image.findAll();
-      if(allImages) return allImages;
-      return [];
-    }catch(error){
-      console.log(error);
-    }
-  }
-  
-  getById = async (imageId) => {
-    try{
-      const image = await Image.findByPk(imageId);
-      if(image) return image;
-      return [];
-    }catch(error){
-      console.log(error);
-    }
-  }
-
-  update = async ({updatedData, imageId}) => {
-    try{
-      const  [rowsUpdated, [updatedImage]] = await Image.update(updatedData, {
-        where: { id: imageId },
-        returning: true,
-      });
-      if(rowsUpdated > 0) return updatedImage;
-      else return [];
-    }catch(error){
-      console.log(error);
-    }
-  }
-
-  delete = async ({imageId}) => {
-    try{
-      const rowsDeleted = await Image.destroy({
-        where: { id: imageId },
-      });
-      if(rowsDeleted > 0) return {message: "Image deleted successfully"};
-      else return [];
-    }catch(error){
-      console.log(error);
-    }
-  }
-}

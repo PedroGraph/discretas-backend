@@ -1,6 +1,9 @@
 import sizeOf from 'image-size';
 import fs from 'fs';
-import path from 'path';
+import { fileURLToPath } from 'url';
+import path, { dirname } from 'path';
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 async function verifyImage(buffer) {
     try {
@@ -30,4 +33,30 @@ async function saveImage(buffer, rutaDirectorio, nombreArchivo) {
     await fs.writeFileSync(path.join(rutaDirectorio, nombreArchivo), buffer);
 }
 
-export { verifyImage, generateFileName, saveImage };
+async function saveImageIntoPath(body, file) {
+    if (!file) {
+        logger.warn('File not found');
+        throw new Error('File not found');
+    }
+
+    const isAImage = await verifyImage(file.buffer);
+    if (!isAImage) {
+        logger.warn('File is not an image');
+        return res.status(400).send('El archivo no es una imagen o tiene una extensión no válida.');
+    }
+
+    const productName = body.productName.replaceAll(" ", "_");
+    const fileName = generateFileName(productName, file.originalname);
+    const filepath = path.resolve(__dirname, '..', '..', 'public', 'uploads', productName);
+    await saveImage(file.buffer, filepath, fileName);
+
+    return {
+        imageName: fileName,
+        imagePath: filepath,
+    }
+}
+
+
+
+
+export { verifyImage, generateFileName, saveImage, saveImageIntoPath };

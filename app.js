@@ -31,7 +31,6 @@ export const mainApp = (models) => {
   // Configuración de rutas principales
   mainRoutes(app, models);
 
-
   // Configuración del servidor y escucha del puerto
   if (!import.meta.main) {
     const port = process.env.PORT || 4000;

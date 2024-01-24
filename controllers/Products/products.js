@@ -1,4 +1,5 @@
 import logger from '../../logCreator/log.js';
+import { saveImageIntoPath } from '../../utils/images.js';
 
 export class ProductController {
   constructor( productModel ) {
@@ -7,8 +8,9 @@ export class ProductController {
 
   createProduct = async (req, res) => {
     try {
-      let { body } = req;
-      const newProduct = await this.productModel.save(body);
+      let { body, file } = req;
+      const productImage = await saveImageIntoPath(body, file);
+      const newProduct = await this.productModel.createProduct(body, productImage);
       logger.info('A new product has been created');
       res.status(201).json({ info: newProduct });
     } catch (error) {
@@ -19,7 +21,7 @@ export class ProductController {
 
   getAllProducts = async (req, res) => {
     try {
-      const products = await this.productModel.getAll();
+      const products = await this.productModel.getAllProducts();
       logger.info('Items obtained successfully');
       res.status(200).json(products);
     } catch (error) {
@@ -31,7 +33,7 @@ export class ProductController {
   getProductById = async (req, res) => {
     const productId = req.params.id;
     try {
-      const product = await this.productModel.getById(productId);
+      const product = await this.productModel.getProductById(productId);
       if (product) {
         logger.info(`Product obtained successfully - ${productId}`);
         return res.status(200).json(product);
@@ -49,7 +51,7 @@ export class ProductController {
     const updatedData = req.body;
 
     try {
-      const updatedProduct = await this.productModel.update({ updatedData, productId });
+      const updatedProduct = await this.productModel.updateProductById({ updatedData, productId });
 
       if (updatedProduct) {
         logger.info(`Product with id ${productId} has been updated successfully`);
@@ -68,7 +70,7 @@ export class ProductController {
   deleteProduct = async (req, res) => {
     const productId = parseInt(req.params.productId);
     try {
-      const deletedProduct = await this.productModel.delete(productId);
+      const deletedProduct = await this.productModel.deleteProductById(productId);
 
       if (deletedProduct) {
         logger.info(`Product with id ${productId} has been deleted`);

@@ -1,10 +1,12 @@
 import chai from 'chai';
 import supertest from 'supertest';
 import app from '../mainServer.js';
+import syncDatabase from '../models/postgres/mainModels.js';
 import fs from 'fs';
 
 const expect = chai.expect;
 const request = supertest(app);
+
 
 describe('API Tests', () => {
   let userId = 54;
@@ -20,7 +22,7 @@ describe('API Tests', () => {
       city: 'Example City',
       phoneNumber: '123-456-7890',
     };
-
+    await syncDatabase();
     const response = await request.post('/api/users/create').send(userData);
     expect(response.status).to.equal(201);
     expect(response.body.info).to.have.property('id');

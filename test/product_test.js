@@ -19,10 +19,17 @@ describe('API Tests', () => {
       productQuantity: 50,
     };
 
-    const response = await request.post('/api/products/create').send(productData);
+    const imageFile = {
+      buffer: fs.readFileSync('./test/test files/overview.jpeg'),
+      originalname: 'producto1.jpeg',
+    };
+
+    const response = await request.post('/api/products/create')
+    .field(productData)
+    .attach('image', imageFile.buffer, { filename: imageFile.originalname });
     expect(response.status).to.equal(201);
-    expect(response.body.info).to.have.property('id');
-    productId = response.body.info.id; // Almacena el ID del producto creado para usarlo en la siguiente prueba
+    productId = response.body.info.product.id; // Almacena el ID del producto creado para usarlo en la siguiente prueba
+
   });
 
   // Prueba para obtener todos los productos
@@ -53,32 +60,7 @@ describe('API Tests', () => {
     expect(response.body.info.id).to.equal(productId);
   });
 
-  // Prueba para crear una imagen asociada al producto
-  it('should create a new image for the product', async () => {
-    const imageFile = {
-      buffer: fs.readFileSync('./test/test files/overview.jpeg'),
-      originalname: 'producto1.jpeg',
-    };
-  
-    const imageCreationData = {
-      productName: 'Nuevo Producto',
-      productId: productId,
-    };
-  
-    const response = await request
-      .post('/api/images/create')
-      .field(imageCreationData)
-      .attach('image', imageFile.buffer, { filename: imageFile.originalname });
-  
-    try {
-      expect(response.status).to.equal(201);
-    } catch (error) {
-      console.error('Error in test:', error);
-      console.log('Response body:', response.body);
-      throw error; // Re-throw the error to fail the test
-    }
-  });
-
+  // Prueba para borrar un producto
   it('should delete the new product was created', async () => {
     const response = await request
       .delete(`/api/products/delete/${productId}`)

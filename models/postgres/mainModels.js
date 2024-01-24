@@ -1,4 +1,5 @@
-import { Product, Image } from "./product.js";
+import { Product } from "./product.js";
+import { Image } from "./image.js";
 import { User } from "./user.js";
 import { RevokedToken } from "./revokedToken.js";
 

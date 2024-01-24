@@ -1,13 +1,15 @@
 
 import { DataTypes } from 'sequelize';
+import { v4 as uuidv4 } from 'uuid';
 import sequelize from '../../config/database.js';
 import bcrypt from 'bcrypt';
 
 export const User = sequelize.define('user', {
   id: {
-    type: DataTypes.INTEGER,
+    type: DataTypes.UUID,
+    defaultValue: () => uuidv4(),
     primaryKey: true,
-    autoIncrement: true,
+    allowNull: false
   },
   email: {
     type: DataTypes.STRING,
