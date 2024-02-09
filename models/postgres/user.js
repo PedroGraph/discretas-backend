@@ -100,7 +100,9 @@ export class UserModel {
 
   async getAllUsers() {
     try {
-      const users = await User.findAll();
+      const users = await User.findAll({
+        attributes: ['id', 'email', "firstName", "lastName", "isAdmin", "accountStatus", "lastLogin"], 
+      });
       if (users) return users;
       return null;
     } catch (error) {
