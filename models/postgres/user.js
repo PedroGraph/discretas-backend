@@ -104,7 +104,7 @@ export class UserModel {
   async getAllUsers(queryParams = {}) {
     try {
       const { filter, page = 1, pageSize = 10 } = queryParams;
-
+  
       const whereClause = filter
         ? {
             [Op.or]: [
@@ -126,20 +126,26 @@ export class UserModel {
             ],
           }
         : {};
-
-      const users = await User.findAll({
+  
+      const result = await User.findAndCountAll({
         attributes: ['id', 'email', 'firstName', 'lastName', 'isAdmin', 'accountStatus', 'lastLogin'],
         where: whereClause,
         offset: (page - 1) * pageSize,
         limit: pageSize,
       });
-
-      if (users) return users;
-      return null;
+  
+      const { count, rows } = result;
+  
+      return {
+        totalRecords: count,
+        users: rows,
+      };
     } catch (error) {
       console.log(`Error Sever: There has been an error getting the users. Error Message: ${error}`);
+      return null;
     }
   }
+  
 
   async deleteUserById(id) {
     try {
