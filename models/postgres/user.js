@@ -103,18 +103,13 @@ export class UserModel {
 
   async getAllUsers(queryParams = {}) {
     try {
-      const { filter, page = 1, pageSize = 10 } = queryParams;
-  
+      const { filter, page = 1, pageSize = 10, ...additionalFilters } = queryParams;
+
       const whereClause = filter
         ? {
             [Op.or]: [
               Sequelize.where(
-                Sequelize.fn('lower', Sequelize.col('firstName')),
-                'LIKE',
-                `%${filter.toLowerCase()}%`
-              ),
-              Sequelize.where(
-                Sequelize.fn('lower', Sequelize.col('lastName')),
+                Sequelize.fn('lower', Sequelize.fn('concat', Sequelize.col('firstName'), ' ', Sequelize.col('lastName'))),
                 'LIKE',
                 `%${filter.toLowerCase()}%`
               ),
@@ -124,25 +119,21 @@ export class UserModel {
                 `%${filter.toLowerCase()}%`
               ),
             ],
+            ...additionalFilters,
           }
-        : {};
-  
-      const result = await User.findAndCountAll({
+        : { ...additionalFilters };
+
+      const users = await User.findAll({
         attributes: ['id', 'email', 'firstName', 'lastName', 'isAdmin', 'accountStatus', 'lastLogin'],
         where: whereClause,
         offset: (page - 1) * pageSize,
         limit: pageSize,
       });
-  
-      const { count, rows } = result;
-  
-      return {
-        totalRecords: count,
-        users: rows,
-      };
+
+      if (users) return users;
+      return null;
     } catch (error) {
       console.log(`Error Sever: There has been an error getting the users. Error Message: ${error}`);
-      return null;
     }
   }
   
