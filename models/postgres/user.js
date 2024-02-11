@@ -101,8 +101,10 @@ export class UserModel {
 
   }
 
-  async getAllUsers(filter = null) {
+  async getAllUsers(queryParams = {}) {
     try {
+      const { filter, page = 1, pageSize = 10 } = queryParams;
+
       const whereClause = filter
         ? {
             [Op.or]: [
@@ -128,6 +130,8 @@ export class UserModel {
       const users = await User.findAll({
         attributes: ['id', 'email', 'firstName', 'lastName', 'isAdmin', 'accountStatus', 'lastLogin'],
         where: whereClause,
+        offset: (page - 1) * pageSize,
+        limit: pageSize,
       });
 
       if (users) return users;
@@ -136,7 +140,7 @@ export class UserModel {
       console.log(`Error Sever: There has been an error getting the users. Error Message: ${error}`);
     }
   }
-  
+
   async deleteUserById(id) {
     try {
       const deletedUser = await User.destroy({ where: { id } });

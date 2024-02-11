@@ -26,9 +26,9 @@ export class UserController {
 
   getAllUsers = async (req, res) => {
     try {
-      const { filter } = req.query; 
+      const { filter, page, pageSize } = req.query; 
 
-      const users = await this.userModel.getAllUsers(filter);
+      const users = await this.userModel.getAllUsers({ filter, page, pageSize });
 
       logger.info('Getting all users', users);
       if (users) res.status(200).json(users);
