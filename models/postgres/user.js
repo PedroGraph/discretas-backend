@@ -123,19 +123,19 @@ export class UserModel {
           }
         : { ...additionalFilters };
 
-      const users = await User.findAll({
+      const { count, rows: users } = await User.findAndCountAll({
         attributes: ['id', 'email', 'firstName', 'lastName', 'isAdmin', 'accountStatus', 'lastLogin'],
         where: whereClause,
         offset: (page - 1) * pageSize,
         limit: pageSize,
       });
 
-      if (users) return users;
-      return null;
+      return { users, totalRecords: count };
     } catch (error) {
       console.log(`Error Sever: There has been an error getting the users. Error Message: ${error}`);
     }
   }
+
   
 
   async deleteUserById(id) {
