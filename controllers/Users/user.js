@@ -26,7 +26,10 @@ export class UserController {
 
   getAllUsers = async (req, res) => {
     try {
-      const users = await this.userModel.getAllUsers();
+      const { filter } = req.query; 
+
+      const users = await this.userModel.getAllUsers(filter);
+
       logger.info('Getting all users', users);
       if (users) res.status(200).json(users);
       else res.status(404).json({ message: 'No users found' });

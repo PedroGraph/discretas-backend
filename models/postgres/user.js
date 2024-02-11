@@ -69,6 +69,8 @@ export class UserModel {
       const newUser = await User.create({
         ...user,
         password: hashedPassword,
+      },{
+        attributes:  ['id', 'email', "firstName", "lastName", "isAdmin", "accountStatus", "lastLogin"],
       });
       return newUser?.dataValues ?? null;
     } catch (error) {
@@ -98,18 +100,41 @@ export class UserModel {
 
   }
 
-  async getAllUsers() {
-    try {
-      const users = await User.findAll({
-        attributes: ['id', 'email', "firstName", "lastName", "isAdmin", "accountStatus", "lastLogin"], 
-      });
-      if (users) return users;
-      return null;
-    } catch (error) {
-      console.log(`Error Sever: Has been an error getting the users. Error Message: ${error}`);
-    }
+async getAllUsers(filter = null) {
+  try {
+    const whereClause = filter
+      ? {
+          [sequelize.Op.or]: [
+            sequelize.where(
+              sequelize.fn('lower', sequelize.col('firstName')),
+              'LIKE',
+              `%${filter.toLowerCase()}%`
+            ),
+            sequelize.where(
+              sequelize.fn('lower', sequelize.col('lastName')),
+              'LIKE',
+              `%${filter.toLowerCase()}%`
+            ),
+            sequelize.where(
+              sequelize.fn('lower', sequelize.col('email')),
+              'LIKE',
+              `%${filter.toLowerCase()}%`
+            ),
+          ],
+        }
+      : {};
 
+    const users = await User.findAll({
+      attributes: ['id', 'email', 'firstName', 'lastName', 'isAdmin', 'accountStatus', 'lastLogin'],
+      where: whereClause,
+    });
+
+    if (users) return users;
+    return null;
+  } catch (error) {
+    console.log(`Error Sever: There has been an error getting the users. Error Message: ${error}`);
   }
+}
 
   async deleteUserById(id) {
     try {
