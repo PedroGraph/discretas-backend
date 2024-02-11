@@ -1,7 +1,8 @@
 
-import { DataTypes } from 'sequelize';
+import { DataTypes, Sequelize } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
 import sequelize from '../../config/database.js';
+const { Op } = Sequelize;
 import bcrypt from 'bcrypt';
 
 export const User = sequelize.define('user', {
@@ -100,42 +101,42 @@ export class UserModel {
 
   }
 
-async getAllUsers(filter = null) {
-  try {
-    const whereClause = filter
-      ? {
-          [sequelize.Op.or]: [
-            sequelize.where(
-              sequelize.fn('lower', sequelize.col('firstName')),
-              'LIKE',
-              `%${filter.toLowerCase()}%`
-            ),
-            sequelize.where(
-              sequelize.fn('lower', sequelize.col('lastName')),
-              'LIKE',
-              `%${filter.toLowerCase()}%`
-            ),
-            sequelize.where(
-              sequelize.fn('lower', sequelize.col('email')),
-              'LIKE',
-              `%${filter.toLowerCase()}%`
-            ),
-          ],
-        }
-      : {};
+  async getAllUsers(filter = null) {
+    try {
+      const whereClause = filter
+        ? {
+            [Op.or]: [
+              Sequelize.where(
+                Sequelize.fn('lower', Sequelize.col('firstName')),
+                'LIKE',
+                `%${filter.toLowerCase()}%`
+              ),
+              Sequelize.where(
+                Sequelize.fn('lower', Sequelize.col('lastName')),
+                'LIKE',
+                `%${filter.toLowerCase()}%`
+              ),
+              Sequelize.where(
+                Sequelize.fn('lower', Sequelize.col('email')),
+                'LIKE',
+                `%${filter.toLowerCase()}%`
+              ),
+            ],
+          }
+        : {};
 
-    const users = await User.findAll({
-      attributes: ['id', 'email', 'firstName', 'lastName', 'isAdmin', 'accountStatus', 'lastLogin'],
-      where: whereClause,
-    });
+      const users = await User.findAll({
+        attributes: ['id', 'email', 'firstName', 'lastName', 'isAdmin', 'accountStatus', 'lastLogin'],
+        where: whereClause,
+      });
 
-    if (users) return users;
-    return null;
-  } catch (error) {
-    console.log(`Error Sever: There has been an error getting the users. Error Message: ${error}`);
+      if (users) return users;
+      return null;
+    } catch (error) {
+      console.log(`Error Sever: There has been an error getting the users. Error Message: ${error}`);
+    }
   }
-}
-
+  
   async deleteUserById(id) {
     try {
       const deletedUser = await User.destroy({ where: { id } });
