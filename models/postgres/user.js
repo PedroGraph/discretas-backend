@@ -161,12 +161,12 @@ export class UserModel {
   }
   
 
-  async login(email, password) {
+  async login(email, userPassword) {
     try {
-      if (!email || !password) return null;
+      if (!email || !userPassword) return null;
       const user = await User.findOne({ where: { email } });
       if (!user) return null;
-      const isPasswordValid = await bcrypt.compare(password, user.dataValues.password);
+      const isPasswordValid = await bcrypt.compare(userPassword, user.dataValues.password);
       if (!isPasswordValid) return null;
       const {password, resetToken, resetTokenExpiration, emailSubscription, lastLogin, createdAt, updatedAt, ...userInfo} = user.dataValues;
       return userInfo;
