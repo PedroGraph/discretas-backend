@@ -168,7 +168,7 @@ export class UserModel {
       if (!user) return null;
       const isPasswordValid = await bcrypt.compare(password, user.dataValues.password);
       if (!isPasswordValid) return null;
-      const {resetToken, resetTokenExpiration, emailSubscription, lastLogin, createdAt, updatedAt, ...userInfo} = user.dataValues;
+      const {password, resetToken, resetTokenExpiration, emailSubscription, lastLogin, createdAt, updatedAt, ...userInfo} = user.dataValues;
       return userInfo;
     } catch (error) {
       console.log(`Error Sever: Has been an error logging in. Error Message: ${error}`);
