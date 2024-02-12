@@ -97,15 +97,8 @@ export class UserController {
       }
       const token = generateToken(user);
 
-      res.cookie('sessionId', token, {
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        secure: true,
-        sameSite: 'None', // Para permitir el envío en solicitudes cruzadas
-      });
-
       logger.info('Login successful: ', email);
-      res.json({ token });
+      res.json({ token, user });
 
     } catch (error) {
       console.error('Error to login:', error);
