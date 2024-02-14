@@ -24,7 +24,6 @@ export const creatingUserRouter = ({ userModel }) => {
     userRouter.post('/verify-code', userController.verifyPasswordRecoveryCode);
 
     // Ruta para cambiar la contraseña
-    userRouter.post('/change-password', authenticateUser, userController.changePassword);
 
     return userRouter;
 
