@@ -3,8 +3,9 @@ import { addRevokedToken } from '../Token/revokedToken.js';
 import logger from '../../logCreator/log.js';
 import admin from 'firebase-admin'
 import serviceAccount from '../../serviceAccountKey.json' assert { type: 'json' };
+import {passwordRecoveryCode} from '../../utils/generatePasswordCode.js';
+import { sendPasswordRecoveryEmail } from '../../utils/nodemails.js';
 admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
-import { UserModel } from '../../models/postgres/user.js';
 
 export class UserController {
   constructor(userModel) {
@@ -120,8 +121,6 @@ export class UserController {
     }
   }
 
-
-
   loginWithGoogle = async (req, res) => {
     try {
 
@@ -150,7 +149,7 @@ export class UserController {
   resetPassword = async (req, res) => {
     try {
       const { email, password } = req.body;
-      const user = await UserModel.resetPassword(email, password);
+      const user = await userModel.resetPassword(email, password);
       if (user) {
         logger.info('Password reset successful: ', email);
         return res.status(200).json({ message: 'Password reset successful' });
@@ -162,4 +161,56 @@ export class UserController {
       res.status(500).json({ message: 'Error en el servidor' });
     }
   }
+
+  passwordRecovery = async (req, res) =>{
+    try{
+      const { email } = req.body;
+      const user = await this.userModel.getUserInformation(email);
+
+      if (!user) {
+        logger.warn('Password recovery failed: ', email);
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      const token = passwordRecoveryCode();
+      console.log(token)
+      user.resetToken = token;
+      user.resetTokenExpiration = Date.now() + 3600000; 
+      const updatedUser = await this.userModel.updateUserById(user.id, user);
+      const response = await sendPasswordRecoveryEmail(updatedUser.dataValues);
+
+      if (response) {
+        logger.info(`Email sent to: `, email);
+        return res.status(200).json({ info: 'A code has been sent to your email. Please check your email' });
+      }
+
+      logger.warn('Password recovery failed: ', email);
+      return res.status(404).json({ message: 'User not found' });
+
+    } catch (error) {
+      logger.error('Error to recovery password:', error);
+      res.status(500).json({ message: 'Error en el servidor' });
+    }
+  }
+
+  verifyPasswordRecoveryCode = async (req, res) => {
+    try {
+      const { email, recoveryCode } = req.body;
+      const user = await this.userModel.getUserInformation(email);
+      if (!user) {
+        logger.warn('Password recovery failed: ', email);
+        return res.status(404).json({ message: 'User not found' });
+      }
+      if (user.resetToken === recoveryCode && user.resetTokenExpiration > Date.now()) {
+        logger.info('Password recovery successful: ', email);
+        return res.status(200).json({ info: 'Password recovery successful' });
+      }
+      logger.warn('Password recovery failed: ', email);
+      return res.status(404).json({ message: 'User not found' }); 
+    } catch (error) {
+      logger.error('Error to verify password recovery code:', error);
+      res.status(500).json({ message: 'Error en el servidor' });
+    }
+  }
+
 }

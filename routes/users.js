@@ -1,6 +1,6 @@
 
-import {Router} from 'express';
-import {authenticateUser} from '../controllers/Middleware/userMiddleware.js';
+import { Router } from 'express';
+import { authenticateUser } from '../controllers/Middleware/userMiddleware.js';
 import { UserController } from '../controllers/Users/user.js';
 
 export const creatingUserRouter = ({ userModel }) => {
@@ -19,7 +19,12 @@ export const creatingUserRouter = ({ userModel }) => {
     userRouter.post('/googleLogin', userController.loginWithGoogle);
     userRouter.post('/logout', userController.logout);
 
-    // Ruta para la actualización de la contrasenya
+    // Ruta para la recuperación de la contrasenya
+    userRouter.post('/reset-password', userController.passwordRecovery);
+    userRouter.post('/verify-code', userController.verifyPasswordRecoveryCode);
+
+    // Ruta para cambiar la contraseña
+    userRouter.post('/change-password', authenticateUser, userController.changePassword);
 
     return userRouter;
 
