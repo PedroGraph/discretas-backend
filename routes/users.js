@@ -22,6 +22,7 @@ export const creatingUserRouter = ({ userModel }) => {
     // Ruta para la recuperación de la contrasenya
     userRouter.post('/reset-password', userController.passwordRecovery);
     userRouter.post('/verify-code', userController.verifyPasswordRecoveryCode);
+    userRouter.post('/change-password', userController.resetPassword);
 
     // Ruta para cambiar la contraseña
 

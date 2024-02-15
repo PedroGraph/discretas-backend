@@ -173,7 +173,6 @@ export class UserController {
       }
 
       const token = passwordRecoveryCode();
-      console.log(token)
       user.resetToken = token;
       user.resetTokenExpiration = Date.now() + 3600000; 
       const updatedUser = await this.userModel.updateUserById(user.id, user);
@@ -209,6 +208,24 @@ export class UserController {
       return res.status(404).json({ message: 'User not found' }); 
     } catch (error) {
       logger.error('Error to verify password recovery code:', error);
+      res.status(500).json({ message: 'Error en el servidor' });
+    }
+  }
+  
+  changePassword = async (req, res) => {
+    try {
+      const { email, password } = req.body;
+      const user = await this.userModel.getUserInformation(email);
+      if (user) {
+        user.password = password;
+        const updatedUser = await this.userModel.updateUserById(user.id, user);
+        logger.info('Password change successful: ', email);
+        return res.status(200).json({ info: 'Password change successful' });
+      }
+      logger.warn('Password change failed: ', email);
+      return res.status(404).json({ message: 'User not found' });
+    } catch (error) {
+      logger.error('Error to change password:', error);
       res.status(500).json({ message: 'Error en el servidor' });
     }
   }
