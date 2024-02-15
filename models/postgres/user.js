@@ -152,6 +152,7 @@ export class UserModel {
 
   async updateUserById(id, user) {
     try {
+      if(user.password) user.password = await this.generatePasswordHash(user.password);
       const [updatedRowCount, updatedUserRecords] = await User.update(user, { where: { id }, returning: true });
       if (updatedRowCount === 0)return null;
       if (Array.isArray(updatedUserRecords) && updatedUserRecords.length > 0) return updatedUserRecords[0];
