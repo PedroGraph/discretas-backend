@@ -1,10 +1,11 @@
 import express from 'express';
 import cors from 'cors';
 import { mainRoutes } from './routes/mainRoutes.js';
+import syncDatabase from './models/postgres/mainModels.js';
 
 export const mainApp = (models) => {
   const app = express();
-
+  syncDatabase();
   // Configuración básica de Express
   app.enable('trust proxy');
   app.use(express.json());

@@ -1,5 +1,4 @@
 import logger from '../../logCreator/log.js';
-import { saveImageIntoPath } from '../../utils/images.js';
 
 export class ProductController {
   constructor( productModel ) {
@@ -8,9 +7,8 @@ export class ProductController {
 
   createProduct = async (req, res) => {
     try {
-      let { body, file } = req;
-      const productImage = await saveImageIntoPath(body, file);
-      const newProduct = await this.productModel.createProduct(body, productImage);
+      let { body } = req;
+      const newProduct = await this.productModel.createProduct(body);
       logger.info('A new product has been created');
       res.status(201).json({ info: newProduct });
     } catch (error) {

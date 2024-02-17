@@ -1,11 +1,9 @@
 import { generateToken } from '../Middleware/userMiddleware.js';
 import { addRevokedToken } from '../Token/revokedToken.js';
 import logger from '../../logCreator/log.js';
-import admin from 'firebase-admin'
-import serviceAccount from '../../serviceAccountKey.json' assert { type: 'json' };
 import {passwordRecoveryCode} from '../../utils/generatePasswordCode.js';
 import { sendPasswordRecoveryEmail } from '../../utils/nodemails.js';
-admin.initializeApp({ credential: admin.credential.cert(serviceAccount) });
+import { verifyGoogleToken } from '../../models/google/googleAdmin.js';
 
 export class UserController {
   constructor(userModel) {
@@ -125,7 +123,7 @@ export class UserController {
     try {
 
       const tokenId = req.body.idToken;
-      const decodedToken = await admin.auth().verifyIdToken(tokenId);
+      const decodedToken = await verifyGoogleToken(tokenId);
       const uid = decodedToken.uid;
 
       const token = generateToken(uid);

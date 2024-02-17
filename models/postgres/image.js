@@ -11,10 +11,6 @@ export const Image = sequelize.define('image', {
     type: DataTypes.STRING,
     allowNull: false,
   },
-  imagePath: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
 });
 
 export class ImageModel {

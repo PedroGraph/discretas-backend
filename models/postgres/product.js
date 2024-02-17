@@ -8,7 +8,6 @@ export const Product = sequelize.define('products', {
     type: DataTypes.UUID,
     defaultValue: () => uuidv4(),
     primaryKey: true,
-    autoIncrement: true,
   },
   productName: {
     type: DataTypes.STRING,
@@ -47,19 +46,24 @@ Image.belongsTo(Product, { foreignKey: 'productID', targetKey: 'id' });
 
 export class ProductModel {
   // Crear un nuevo producto con una imagen
-  createProduct = async (productData, imageData) => {
+  createProduct = async (productData) => {
     try {
-      // Crea el producto
-      const newProduct = await Product.create(productData);
+      const {productImages, ...productDataWithoutImages} = productData;
+      const newProduct = await Product.create(productDataWithoutImages);
       // Asocia la imagen al producto
-      const newImage = await Image.create({
-        ...imageData,
-        productId: parseInt(newProduct.dataValues.id),
-      });
+      const promises = productImages.map(async (image) => {
+        const newImages = await Image.create({
+          imageName: image,
+          productID: newProduct.dataValues.id,
+        });
+        return newImages;
+      })
+
+      const newImages = await Promise.all(promises);
 
       return {
         product: newProduct,
-        image: newImage,
+        image: newImages,
       };
     } catch (error) {
       console.log(error,);
