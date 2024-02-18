@@ -62,8 +62,8 @@ export class ProductModel {
       const newImages = await Promise.all(promises);
 
       return {
-        product: newProduct,
-        image: newImages,
+       ...newProduc,
+       productImages: newImages
       };
     } catch (error) {
       console.log(error,);
