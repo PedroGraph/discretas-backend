@@ -1,0 +1,34 @@
+[
+  {
+    "firstName": "Pedro",
+    "lastName": "Medina",
+    "email": "p.medina@sell2rent.com",
+    "password": "Pedrograph99",
+    "photourl": "https://lh3.googleusercontent.com/a/ACg8ocIeaB47J_Sg0s4vxaT6MhDSdZ9MxPXpiQqGt4q2P488=s96-c",
+    "address": "123 Main St",
+    "city": "Miami",
+    "phoneNumber": "555-1234",
+    "isAdmin": false,
+    "resetToken": null,
+    "resetTokenExpiration": null,
+    "emailSubscription": true,
+    "accountStatus": "active",
+    "lastLogin": "2024-08-10T10:00:00Z"
+  },
+  {
+    "firstName": "Pedro",
+    "lastName": "Medina",
+    "email": "pedrojosmed@gmail.com",
+    "password": "Pedrojosmed2024$",
+    "photourl": "https://lh3.googleusercontent.com/a/ACg8ocJxQJGuTziIJ0ugJ8Xo7o-5GVGosdwtPTQv5jMbxGu3EtBd=s96-c",
+    "address": "456 Elm St",
+    "city": "Orlando",
+    "phoneNumber": "555-5678",
+    "isAdmin": false,
+    "resetToken": null,
+    "resetTokenExpiration": null,
+    "emailSubscription": true,
+    "accountStatus": "active",
+    "lastLogin": "2024-08-10T10:00:00Z"
+  }
+]

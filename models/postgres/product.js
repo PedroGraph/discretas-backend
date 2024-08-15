@@ -2,6 +2,7 @@ import { DataTypes } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
 import sequelize from '../../config/database.js';
 import { Image } from './image.js';
+import { Op } from 'sequelize';
 
 export const Product = sequelize.define('products', {
   id: {
@@ -34,15 +35,38 @@ export const Product = sequelize.define('products', {
   productQuantity: {
     type: DataTypes.INTEGER,
     allowNull: false,
+    defaultValue: 0,
   },
   productPublished: {
     type: DataTypes.BOOLEAN,
     defaultValue: true,
   },
+  characteristics: {
+    type: DataTypes.JSON,
+    allowNull: true,
+  },
 });
 
 Product.hasMany(Image, { foreignKey: 'productID', sourceKey: 'id' });
 Image.belongsTo(Product, { foreignKey: 'productID', targetKey: 'id' });
+
+Product.beforeCreate((product) => {
+  if (product.characteristics) {
+    const totalQuantity = product.characteristics.reduce((total, characteristic) => {
+      return total + parseInt(characteristic.quantity, 10);
+    }, 0);
+    product.productQuantity = totalQuantity;
+  }
+});
+
+Product.beforeUpdate((product) => {
+  if (product.characteristics) {
+    const totalQuantity = product.characteristics.reduce((total, characteristic) => {
+      return total + parseInt(characteristic.quantity, 10);
+    }, 0);
+    product.productQuantity = totalQuantity;
+  }
+});
 
 export class ProductModel {
   // Crear un nuevo producto con una imagen
@@ -62,8 +86,8 @@ export class ProductModel {
       const newImages = await Promise.all(promises);
 
       return {
-       ...newProduc,
-       productImages: newImages
+        product: newProduct,
+        image: newImages,
       };
     } catch (error) {
       console.log(error,);
@@ -77,7 +101,12 @@ export class ProductModel {
         include: [{ model: Image }],
       });
 
-      return allProducts;
+      const products = allProducts.map((product) => {
+        return {
+          ...product.dataValues,
+        }
+      });
+      return transformProducts(products);
     } catch (error) {
       console.log(error);
     }
@@ -89,8 +118,8 @@ export class ProductModel {
       const product = await Product.findByPk(productId, {
         include: [{ model: Image }],
       });
-
-      return product;
+      const dataValues = product.dataValues;
+      return transformProducts([dataValues])[0];
     } catch (error) {
       console.log(error);
     }
@@ -116,6 +145,26 @@ export class ProductModel {
     }
   }
 
+  getProductsWithFilters = async (filters) => {
+    try {
+      const{ orderBy, ...restFilters} = filters;
+      if(restFilters.productPrice) restFilters.productPrice = { [Op.lt]: restFilters.productPrice };
+      const options = {
+        ...(restFilters ? { where: restFilters } : {}),
+        ...(orderBy ? { order: [orderBy.split("-")] } : {}),
+      }
+      const products = await Product.findAll({ ...options, include: [{ model: Image }] });
+      const formattedProducts = products.map((product) => {
+        return {
+          ...product.dataValues,
+        }
+      });
+      return transformProducts(formattedProducts);
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   // Eliminar un producto por su ID
   deleteProductById = async (productId) => {
     try {
@@ -134,4 +183,11 @@ export class ProductModel {
     }
   }
 }
+
+const transformProducts = (products) => products.map(({ createdAt, updatedAt, ...rest }) =>
+  Object.fromEntries(Object.entries(rest).map(([key, value]) => [
+    key.startsWith('product') ? key.replace(/^product/, '').replace(/^\w/, c => c.toLowerCase()) : key,
+    value
+  ]))
+);
 

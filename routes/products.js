@@ -6,12 +6,14 @@ export const createProductRouter = ({ productModel }) => {
 
     const productsRouter = Router();
     const productController = new ProductController( productModel );
+    const { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, getProductsWithFilters } = productController;
 
-    productsRouter.post('/create', productController.createProduct);
-    productsRouter.get('/all', productController.getAllProducts);
-    productsRouter.get('/:id', productController.getProductById);
-    productsRouter.put('/update/:id', productController.updateProduct);
-    productsRouter.delete('/delete/:productId', productController.deleteProduct);
+    productsRouter.get('/filters', getProductsWithFilters);
+    productsRouter.post('/create', createProduct);
+    productsRouter.get('/all', getAllProducts);
+    productsRouter.get('/:id', getProductById);
+    productsRouter.put('/update/:id', updateProduct);
+    productsRouter.delete('/delete/:productId', deleteProduct);
 
     return productsRouter;
 

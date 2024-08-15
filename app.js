@@ -12,7 +12,7 @@ export const mainApp = (models) => {
 
   // Configuración de CORS
   const whitelist = [
-    "http://localhost:3000", "https://discretasseduccion.vercel.app"
+    "http://localhost:5173", "https://discretasseduccion.vercel.app", 
   ];
 
   const corsOptions = {

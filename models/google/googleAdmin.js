@@ -1,6 +1,8 @@
 
 import admin from 'firebase-admin'
-import serviceAccount from '../../serviceAccountKey.json' assert { type: 'json' };
+import env from 'dotenv';
+env.config();
+const serviceAccount = JSON.parse(process.env.GOOGLE_CLOUD_KEY);
 admin.initializeApp({ credential: admin.credential.cert(serviceAccount)});
 
 export const verifyGoogleToken = async (token) => {

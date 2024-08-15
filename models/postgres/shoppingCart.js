@@ -1,14 +1,22 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../../config/database.js';
-import { ShoppingCart } from './shoppingCart.js';
-import { CartItem } from './cartItem';
 import { Product } from './product.js';
+import { v4 as uuidv4 } from 'uuid';
 
 export const ShoppingCart = sequelize.define('shoppingCart', {
     id: {
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
+        defaultValue: () => uuidv4(),
         primaryKey: true,
-        autoIncrement: true,
+    },
+    userId: {
+        type: DataTypes.UUID,
+        allowNull: false,
+    },
+    products: {
+        type: DataTypes.JSONB,
+        allowNull: false,
+        defaultValue: [],
     },
     totalAmount: {
         type: DataTypes.INTEGER,
@@ -17,103 +25,104 @@ export const ShoppingCart = sequelize.define('shoppingCart', {
 });
 
 export class ShoppingCartModel {
-
-  addProductToCart = async ({ userId, productId, quantity }) => {
-    try {
-        
-      const shoppingCart = await ShoppingCart.findOne({
-        where: { userId },
-        include: [{ model: Product, through: CartItem }],
-      });
-
-      if (!shoppingCart) {
-        console.log('User shopping cart not found');
-        return null;
-      }
-
-      await CartItem.create({
-        quantity,
-        productId,
-        shoppingCartId: shoppingCart.id,
-      });
-
-      const updatedTotalAmount = await calculateTotalAmount(shoppingCart.id);
-      await shoppingCart.update({ totalAmount: updatedTotalAmount });
-
-      return shoppingCart;
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
-
-  getAllProductsInCart = async (userId) => {
-    try {
     
-      const shoppingCart = await ShoppingCart.findOne({
-        where: { userId },
-        include: [{ model: Product, through: CartItem }],
-      });
+    addProductToShoppingCart = async ({ userId, products }) => {
+        try {
 
-      if (!shoppingCart) {
-        console.log('User shopping cart not found');
-        return null;
-      }
+            let shoppingCart = await ShoppingCart.findOne({ where: { userId } });
 
-      
-      return shoppingCart.Products;
-    } catch (error) {
-      console.log(error);
+            if (!shoppingCart) {
+                shoppingCart = await ShoppingCart.create({
+                    userId, 
+                    totalAmount: 0, 
+                });
+            }
+
+            const newProducts = products.map(product => ({
+                productID: product.productID,
+                price: product.price,
+                quantity: product.quantity,
+                size: product.size,
+                color: product.color,
+            }));
+
+            const updatedProducts = shoppingCart.products.length > 0 ? [...shoppingCart.products, ...newProducts] : newProducts;
+            const updatedTotalAmount = this.calculateTotalAmount(updatedProducts);
+
+            console.log(updatedProducts);
+            console.log(updatedTotalAmount);
+
+            await shoppingCart.update({ 
+                products: updatedProducts,
+                totalAmount: updatedTotalAmount 
+            });
+
+            return shoppingCart;
+
+        } catch (error) {
+            console.log(error);
+        }
     }
-  }
 
-  updateCart = async ({ userId, updatedData }) => {
-    try {
-     
-      const [rowsUpdated, [updatedShoppingCart]] = await ShoppingCart.update(updatedData, {
-        where: { userId },
-        returning: true,
-      });
+    getProductsFromShoppingCart = async (userId) => {
+        try {
+            const shoppingCart = await ShoppingCart.findOne({ where: { userId } });
 
-      if (rowsUpdated > 0) {
-        return updatedShoppingCart;
-      } else {
-        console.log('Shopping cart was not updated');
-        return null;
-      }
-    } catch (error) {
-      console.log(error);
+            if (!shoppingCart) {
+                console.log('User shopping cart not found');
+                return null;
+            }
+
+            return shoppingCart.products;
+        } catch (error) {
+            console.log(error);
+        }
     }
-  }
 
-  // Eliminar un producto del carrito
-  deleteProductFromCart = async ({ userId, productId }) => {
-    try {
-      const shoppingCart = await ShoppingCart.findOne({
-        where: { userId },
-        include: [{ model: Product, through: CartItem }],
-      });
+    updateProductIntoShoppingCart = async ({ userId, updatedData }) => {
+        try {
+            const [rowsUpdated, [updatedShoppingCart]] = await ShoppingCart.update(updatedData, {
+                where: { userId },
+                returning: true,
+            });
 
-      if (!shoppingCart) {
-        console.log('User shopping cart not found');
-        return null;
-      }
-
-      await CartItem.destroy({
-        where: { shoppingCartId: shoppingCart.id, productId },
-      });
-
-      const updatedTotalAmount = await calculateTotalAmount(shoppingCart.id);
-      await shoppingCart.update({ totalAmount: updatedTotalAmount });
-
-      return shoppingCart;
-    } catch (error) {
-      console.log(error);
+            if (rowsUpdated > 0) {
+                return updatedShoppingCart;
+            } else {
+                console.log('Shopping cart was not updated');
+                return null;
+            }
+        } catch (error) {
+            console.log(error);
+        }
     }
-  }
-}
 
-async function calculateTotalAmount(shoppingCartId) {
-  // Implementa la lógica para calcular el totalAmount basándote en los productos actuales en el carrito
-  // ...
+    deleteShoppingCart = async ({ userId, productID }) => {
+        try {
+            const shoppingCart = await ShoppingCart.findOne({ where: { userId } });
+
+            if (!shoppingCart) {
+                console.log('User shopping cart not found');
+                return null;
+            }
+
+            const updatedProducts = shoppingCart.products.filter(product => product.productID !== productID);
+            const updatedTotalAmount = this.calculateTotalAmount(updatedProducts);
+
+            await shoppingCart.update({ 
+                products: updatedProducts,
+                totalAmount: updatedTotalAmount 
+            });
+
+            return shoppingCart;
+        } catch (error) {
+            console.log(error);
+        }
+    }
+
+    calculateTotalAmount = (products) => {
+        return products.reduce((total, product) => {
+            return total + (product.price * product.quantity);
+        }, 0);
+    }
 }

@@ -44,6 +44,22 @@ export class ProductController {
     }
   }
 
+  getProductsWithFilters = async (req, res) => {
+    try{
+      const { query } = req;
+      const products = await this.productModel.getProductsWithFilters(query);
+      if(products){
+        logger.info("Products filtered successfully");
+        return res.status(200).json(products);
+      }
+      logger.warn("Products not fund");
+      return res.status(404).json({ error: 'Products not found' });
+    }catch(error){
+      logger.error(`Error obtaining products - Server error`);
+      res.status(500).json({ error: `Error server: the products could not be obtained. Error message: ${error}` });
+    }
+  }
+
   updateProduct = async (req, res) => {
     const productId = req.params.id;
     const updatedData = req.body;
