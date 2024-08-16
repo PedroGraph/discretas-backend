@@ -29,6 +29,16 @@ export const mainApp = (models) => {
 
   // app.use(cors(corsOptions));
 
+  const corsOptions = {
+    origin: (origin, callback) => {
+      callback(null, true);
+    },
+    credentials: true, // Permitir el envío de cookies
+  };
+  
+  app.use(cors(corsOptions));
+  
+
   // Configuración de rutas principales
   mainRoutes(app, models);
 
