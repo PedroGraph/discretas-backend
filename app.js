@@ -11,23 +11,23 @@ export const mainApp = (models) => {
   app.use(express.json());
 
   // Configuración de CORS
-  const whitelist = [
-    "http://localhost:5173", "https://discretasseduccion.vercel.app", 
-  ];
+  // const whitelist = [
+  //   "http://localhost:5173", "https://discretasseduccion.vercel.app", 
+  // ];
 
-  const corsOptions = {
-    origin: (origin, callback) => {
-      if (!origin || whitelist.includes(origin)) {
-        callback(null, true);
-      } else {
-        console.log('Error de CORS: La solicitud desde', origin, 'no está permitida');
-        callback(new Error("Error de CORS"));
-      }
-    },
-    credentials: true, // Agrega esta línea para permitir el envío de cookies
-  };
+  // const corsOptions = {
+  //   origin: (origin, callback) => {
+  //     if (!origin || whitelist.includes(origin)) {
+  //       callback(null, true);
+  //     } else {
+  //       console.log('Error de CORS: La solicitud desde', origin, 'no está permitida');
+  //       callback(new Error("Error de CORS"));
+  //     }
+  //   },
+  //   credentials: true, // Agrega esta línea para permitir el envío de cookies
+  // };
 
-  app.use(cors(corsOptions));
+  // app.use(cors(corsOptions));
 
   // Configuración de rutas principales
   mainRoutes(app, models);
