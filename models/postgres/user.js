@@ -83,12 +83,12 @@ export class UserModel {
     }
   }
 
-  async getUserInformation( email ) {
+  async getUserInformation(email) {
     try {
-      const user = await User.findOne({ where: { email: email } });
+      const user = await User.findOne({ where: email });
+      if (!user) return null;
       const {password, ...userInfo} = user?.dataValues;
-      if (user) return userInfo;
-      return null;
+      return userInfo;
     } catch (error) {
       console.log(`Error Sever: Has been an error getting the user. Error Message: ${error}`);
     }

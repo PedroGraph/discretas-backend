@@ -8,7 +8,7 @@ export const creatingUserRouter = ({ userModel }) => {
     const userController = new UserController(userModel);
     const userRouter = Router();
     // Rutas CRUD
-    userRouter.post('/create', userController.createUser);
+    userRouter.post('/signup', userController.createUser);
     userRouter.get('/all', userController.getAllUsers);
     userRouter.get('/getuser/:id', userController.getUserById);
     userRouter.put('/updateuser/:id',  userController.updateUserById);

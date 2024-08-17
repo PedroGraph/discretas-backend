@@ -40,11 +40,13 @@ export class UserController {
 
   getUserById = async (req, res) => {
     try {
-      const userId = req.params.id;
-      const user = await this.userModel.getUserById({ id: userId });
-      logger.info('Getting user by ID:', userId);
+      let user;
+      const userInfo = req.params.id;
+      if(userInfo.includes('@')) user = await this.userModel.getUserInformation({email: userInfo});
+      else user = await this.userModel.getUserById({ id: userInfo });
       if (user) res.status(200).json(user);
       else res.status(404).json({ message: 'User not found' });
+      // logger.info('Getting user by ID:', user.id);
     } catch (error) {
       logger.error('Error to get user by ID:', error);
       res.status(500).json({ message: 'Error en el servidor' });
