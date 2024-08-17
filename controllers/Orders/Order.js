@@ -38,15 +38,12 @@ export class OrderController {
     try {
       const { userId } = req.params;
       const getAllOrders = await this.orderModel.getAllOrders(userId);
-
-      if (!getAllOrders) {
+      if (getAllOrders.length === 0) {
         logger.warn(`Orders by ${userId} were not found`);
         return res.status(404).json({ error: 'Orders not found' });
       }
-
       logger.warn(`Orders by ${userId} has been found`);
-      return res.status(404).json(getAllOrders);
-
+      return res.status(201).json(getAllOrders);
     } catch (error) {
       logger.error(`Error obtaining items - Server error. Error message: ${error}`);
       res.status(500).json({ error: `Error server: the items could not be obtained. Error message: ${error}` });

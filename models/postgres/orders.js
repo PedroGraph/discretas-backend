@@ -51,10 +51,13 @@ export class OrderModel {
 
   getAllOrders = async (userId) => {
     try {
-      const allOrders = await Order.find({
+      const allOrders = await Order.findAll({
         where: { userId: userId }
       });
-      return allOrders;
+      const orders = allOrders.map(order => {
+        return order.dataValues
+      })
+      return orders
     } catch (error) {
       console.log(error);
     }
