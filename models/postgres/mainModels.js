@@ -4,8 +4,10 @@ import { User } from "./user.js";
 import { RevokedToken } from "./revokedToken.js";
 import { ShoppingCart } from "./shoppingCart.js";
 import { Order } from "./orders.js";
+import { UsedDiscountCode } from "./usedDiscountCodes.js";
+import { DiscountCode } from "./discountCodes.js";
 
-const models = { Product, Image, User, RevokedToken, ShoppingCart, Order}; 
+const models = { Product, Image, User, RevokedToken, ShoppingCart, Order, DiscountCode, UsedDiscountCode }; 
 
 async function syncDatabase() {
     try {
