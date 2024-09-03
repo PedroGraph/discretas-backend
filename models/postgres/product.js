@@ -2,7 +2,7 @@ import { DataTypes } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
 import sequelize from '../../config/database.js';
 import { Image } from './image.js';
-import { Op } from 'sequelize';
+import { Op, fn, col, where } from 'sequelize';
 
 export const Product = sequelize.define('products', {
   id: {
@@ -148,7 +148,8 @@ export class ProductModel {
   getProductsWithFilters = async (filters) => {
     try {
       const{ orderBy, ...restFilters} = filters;
-      if(restFilters.productPrice) restFilters.productPrice = { [Op.lt]: restFilters.productPrice };
+      if(restFilters.productPrice) restFilters.productPrice = { [Op.between]: restFilters.productPrice.split(",") };
+      if(restFilters.productName)  restFilters.productName = where(fn('LOWER', col('productName')),{ [Op.like]: `%${restFilters.productName.toLowerCase()}%` });
       const options = {
         ...(restFilters ? { where: restFilters } : {}),
         ...(orderBy ? { order: [orderBy.split("-")] } : {}),
