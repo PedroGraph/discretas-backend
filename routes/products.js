@@ -2,10 +2,10 @@ import { Router } from 'express';
 import authMiddleware from '../controllers/Middleware/middleware.js';
 import { ProductController } from '../controllers/Products/products.js';
 
-export const createProductRouter = ({ productModel }) => {
+export const createProductRouter = ({ productModel }, redis) => {
 
     const productsRouter = Router();
-    const productController = new ProductController( productModel );
+    const productController = new ProductController( productModel, redis );
     const { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, getProductsWithFilters } = productController;
 
     productsRouter.get('/filters', getProductsWithFilters);

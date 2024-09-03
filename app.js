@@ -1,34 +1,31 @@
 import express from 'express';
 import cors from 'cors';
+import { createClient } from 'redis';
 import { mainRoutes } from './routes/mainRoutes.js';
 import syncDatabase from './models/postgres/mainModels.js';
 
-export const mainApp = (models) => {
+const redisClient = createClient({
+  password: 'tLbYmGhlgNJFmGJIcSpkM9dWjzRW8FgK',
+  socket: {
+    host: 'redis-12924.c258.us-east-1-4.ec2.redns.redis-cloud.com',
+    port: 12924
+  }
+});
+
+redisClient.on('error', (err) => console.log('Redis Client Error', err));
+
+export const mainApp = async (models) => {
   const app = express();
   syncDatabase();
+
+  // Conectar a Redis
+  await redisClient.connect();
+
   // Configuración básica de Express
   app.enable('trust proxy');
   app.use(express.json());
 
   // Configuración de CORS
-  // const whitelist = [
-  //   "http://localhost:5173", "https://discretasseduccion.vercel.app", 
-  // ];
-
-  // const corsOptions = {
-  //   origin: (origin, callback) => {
-  //     if (!origin || whitelist.includes(origin)) {
-  //       callback(null, true);
-  //     } else {
-  //       console.log('Error de CORS: La solicitud desde', origin, 'no está permitida');
-  //       callback(new Error("Error de CORS"));
-  //     }
-  //   },
-  //   credentials: true, // Agrega esta línea para permitir el envío de cookies
-  // };
-
-  // app.use(cors(corsOptions));
-
   const corsOptions = {
     origin: (origin, callback) => {
       callback(null, true);
@@ -37,10 +34,9 @@ export const mainApp = (models) => {
   };
   
   app.use(cors(corsOptions));
-  
 
   // Configuración de rutas principales
-  mainRoutes(app, models);
+  mainRoutes(app, models, redisClient);
 
   // Configuración del servidor y escucha del puerto
   if (!import.meta.main) {
@@ -51,5 +47,10 @@ export const mainApp = (models) => {
   }
 
   return app;
-
 }
+
+// Manejo de cierre de la aplicación
+process.on('SIGINT', async () => {
+  await redisClient.quit();
+  process.exit(0);
+});
