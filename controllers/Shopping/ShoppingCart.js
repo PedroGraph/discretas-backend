@@ -34,7 +34,6 @@ export class ShoppingController {
   updateProductIntoShoppingCart = async (req, res) => {
     const userId = req.params.id;
     const {productId, quantity} = req.body;
-    console.log(req.body)
     try {
       const updateShoppingCart = await this.shoppingModel.updateProductQuantityInShoppingCart({ userId, productId, quantity });
 
