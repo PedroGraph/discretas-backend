@@ -5,6 +5,7 @@ import { ShoppingCartModel } from "./models/postgres/shoppingCart.js";
 import { OrderModel } from "./models/postgres/orders.js";
 import { DiscountCodeModel } from "./models/postgres/discountCodes.js";
 import { UsedDiscountCodeModel } from "./models/postgres/usedDiscountCodes.js";
+import { MercadoPagoModel } from "./models/mercadoPago/payment.js";
 // import 
 
 const app = mainApp({ 
@@ -14,6 +15,7 @@ const app = mainApp({
     orderModel: new OrderModel(),
     discountCodeModel: new DiscountCodeModel(),
     usedDiscountCodeModel: new UsedDiscountCodeModel(),
+    mercadoPagoModel: new MercadoPagoModel(),
 });
 
 export default app
