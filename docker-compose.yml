@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  discreta_seduccion_prod:
+    build: .
+    ports:
+      - "3000:3000"
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_USER=postgres
+      - DB_PASSWORD=1001970262
+      - DB_NAME=discreta_seduccion_prod
+    command: npm run start
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: 1001970262
+      POSTGRES_DB: discreta_seduccion_prod
+    ports:
+      - "5432:5432"

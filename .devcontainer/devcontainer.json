@@ -1,0 +1,16 @@
+{
+  "name": "Discreta Seduccion Prod",
+  "dockerComposeFile": "../docker-compose.yml",
+  "service": "discreta_seduccion_prod",
+  "workspaceFolder": "/usr/src/app",
+  "settings": {
+      "terminal.integrated.shell.linux": "/bin/bash"
+  },
+  "extensions": [
+      "dbaeumer.vscode-eslint",
+      "esbenp.prettier-vscode",
+      "humao.rest-client"
+  ],
+  "forwardPorts": [3000, 5432],
+  "postCreateCommand": "npm install"
+}
