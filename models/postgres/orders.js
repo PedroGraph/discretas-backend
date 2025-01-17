@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../../config/database.js';
+import { Op } from 'sequelize';
 import { v4 as uuidv4 } from 'uuid';
 
 export const Order = sequelize.define('order', {
@@ -14,15 +15,35 @@ export const Order = sequelize.define('order', {
   },
   orderId: {
     type: DataTypes.STRING,
-    allowNull: false,
-    defaultValue: () => Math.floor(Math.random() * 9000000000) + 1000000000
+    allowNull: false, // Permitimos valores repetidos
+    defaultValue: () => Math.floor(Math.random() * 9000000000) + 1000000000,
   },
-  products:{
-    type: DataTypes.JSONB,
+  productId: {
+    type: DataTypes.UUID,
     allowNull: false,
+  },
+  paymentId: {
+    type: DataTypes.UUID,
+    allowNull: true,
+  },
+  quantity: {
+    type: DataTypes.INTEGER,
+    allowNull: false,
+  },
+  size: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  color: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  discount: {
+    type: DataTypes.FLOAT,
+    allowNull: true,
   },
   shippingAddress: {
-    type: DataTypes.JSONB,
+    type: DataTypes.JSONB, // Guarda como JSON el objeto completo
     allowNull: false,
   },
 });
@@ -30,36 +51,61 @@ export const Order = sequelize.define('order', {
 export class OrderModel {
 
   createNewOrder = async (orderInfo) => {
-    try {
-      const newOrder = await Order.create({...orderInfo});
-      return newOrder;
-    } catch (error) {
-      console.log(error);
-    }
-  }
+    const { order, address, city, state, paymentId } = orderInfo;
 
-  getOrderById = async (orderId) => {
     try {
-      const order = await Order.findOne({
-        where: { orderId: orderId }    
+      const orderId = Math.floor(Math.random() * 9000000000) + 1000000000;
+      const shippingAddress = {
+        address,
+        city,
+        state,
+      };
+
+      const newOrders = await Promise.all(
+        order.map((product) =>
+          Order.create({
+            ...product,
+            paymentId,
+            shippingAddress, 
+            orderId, 
+          })
+        )
+      );
+
+      return newOrders;
+    } catch (error) {
+      console.error('Error al crear órdenes:', error);
+      throw error;
+    }
+  };
+
+  async getOrderById(orderId) {
+    try {
+      const orders = await Order.findAll({
+        where: { orderId },
       });
-      return order;
+      return orders;
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      throw error;
     }
   }
 
-  getAllOrders = async (userId) => {
+  async getAllOrders(userId, limitDate) {
     try {
       const allOrders = await Order.findAll({
-        where: { userId: userId }
+        where: {
+          userId,
+          createdAt: {
+            [Op.between]: [new Date(limitDate), new Date()],
+          },
+        },
+        order: [['createdAt', 'DESC']],
       });
-      const orders = allOrders.map(order => {
-        return order.dataValues
-      })
-      return orders
+      return allOrders.map((order) => order.dataValues);
     } catch (error) {
-      console.log(error);
+      console.error(error);
+      throw error;
     }
   }
 }

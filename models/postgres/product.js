@@ -53,7 +53,10 @@ Image.belongsTo(Product, { foreignKey: 'productID', targetKey: 'id' });
 Product.beforeCreate((product) => {
   if (product.characteristics) {
     const totalQuantity = product.characteristics.reduce((total, characteristic) => {
-      return total + parseInt(characteristic.quantity, 10);
+      const sizesTotal = characteristic.sizes?.reduce((sizeTotal, size) => {
+        return sizeTotal + (parseInt(size.quantity, 10) || 0);
+      }, 0) || 0;
+      return total + sizesTotal;
     }, 0);
     product.productQuantity = totalQuantity;
   }
@@ -62,7 +65,10 @@ Product.beforeCreate((product) => {
 Product.beforeUpdate((product) => {
   if (product.characteristics) {
     const totalQuantity = product.characteristics.reduce((total, characteristic) => {
-      return total + parseInt(characteristic.quantity, 10);
+      const sizesTotal = characteristic.sizes?.reduce((sizeTotal, size) => {
+        return sizeTotal + (parseInt(size.quantity, 10) || 0);
+      }, 0) || 0;
+      return total + sizesTotal;
     }, 0);
     product.productQuantity = totalQuantity;
   }
@@ -100,7 +106,6 @@ export class ProductModel {
       const allProducts = await Product.findAll({
         include: [{ model: Image }],
       });
-
       const products = allProducts.map((product) => {
         return {
           ...product.dataValues,
@@ -118,6 +123,7 @@ export class ProductModel {
       const product = await Product.findByPk(productId, {
         include: [{ model: Image }],
       });
+      if(!product) return null;
       const dataValues = product.dataValues;
       return transformProducts([dataValues])[0];
     } catch (error) {

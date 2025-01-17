@@ -40,6 +40,9 @@ export const User = sequelize.define('user', {
   city: {
     type: DataTypes.STRING,
   },
+  state: {
+    type: DataTypes.STRING,
+  },
   phoneNumber: {
     type: DataTypes.STRING,
   },
@@ -77,6 +80,7 @@ export class UserModel {
       },{
         attributes:  ['id', 'email', "firstName", "lastName", "isAdmin", "accountStatus", "lastLogin"],
       });
+      console.log(newUser)
       return newUser?.dataValues ?? null;
     } catch (error) {
       console.log(`Server error: Has been an error creating the user. Error Message: ${error}`);
@@ -87,7 +91,7 @@ export class UserModel {
     try {
       const user = await User.findOne({ where: email });
       if (!user) return null;
-      const {password, ...userInfo} = user?.dataValues;
+      const {password, resetToken, resetTokenExpiration, emailSubscription, updatedAt, createdAt, ...userInfo} = user?.dataValues;
       return userInfo;
     } catch (error) {
       console.log(`Error Sever: Has been an error getting the user. Error Message: ${error}`);
@@ -98,8 +102,9 @@ export class UserModel {
   async getUserById({ id }) {
     try {
       const user = await User.findByPk(id);
-      if (user) return user;
-      return null;
+      if (!user) return null;
+      const {password, resetToken, resetTokenExpiration, emailSubscription, updatedAt, createdAt, ...userInfo} = user?.dataValues;
+      return userInfo;
     } catch (error) {
       console.log(`Error Sever: Has been an error getting the user with id ${id}. Error Message: ${error}`);
     }

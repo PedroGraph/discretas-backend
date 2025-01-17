@@ -1,6 +1,7 @@
 import { DataTypes } from 'sequelize';
 import sequelize from '../../config/database.js';
 import { Product } from './product.js';
+import { Image } from './image.js'; // Asegúrate de importar el modelo Image
 import { v4 as uuidv4 } from 'uuid';
 
 export const ShoppingCart = sequelize.define('shoppingCart', {
@@ -13,145 +14,121 @@ export const ShoppingCart = sequelize.define('shoppingCart', {
         type: DataTypes.UUID,
         allowNull: false,
     },
-    products: {
-        type: DataTypes.JSONB,
+    productId: {
+        type: DataTypes.UUID,
         allowNull: false,
-        defaultValue: [],
     },
-    totalAmount: {
+    quantity: {
         type: DataTypes.INTEGER,
         allowNull: false,
     },
+    size: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    color: {
+        type: DataTypes.STRING,
+        allowNull: false,
+    },
+    discount: {
+        type: DataTypes.FLOAT,
+        allowNull: true,
+    },
 });
 
+ShoppingCart.belongsTo(Product, { foreignKey: 'productId', targetKey: 'id' });
+Product.hasMany(ShoppingCart, { foreignKey: 'productId', sourceKey: 'id' });
+
+// Asegúrate de que Product esté relacionado con Image
+Product.hasMany(Image, { foreignKey: 'productID', sourceKey: 'id' });
+Image.belongsTo(Product, { foreignKey: 'productID', targetKey: 'id' });
+
 export class ShoppingCartModel {
-    
-    addProductToShoppingCart = async ({ userId, products }) => {
+    async addProductToShoppingCart(cartData) {
         try {
-            let shoppingCart = await ShoppingCart.findOne({ where: { userId } });
-    
-            if (!shoppingCart) {
-                shoppingCart = await ShoppingCart.create({
-                    userId, 
-                    totalAmount: 0,
-                    products: [], 
-                });
+            const existingItem = await ShoppingCart.findOne({
+                where: {
+                    userId: cartData.userId,
+                    productId: cartData.productId,
+                    size: cartData.size,
+                    color: cartData.color,
+                },
+            });
+
+            if (existingItem) {
+                existingItem.quantity += cartData.quantity;
+                await existingItem.save();
+                return existingItem;
+            } else {
+                const newItem = await ShoppingCart.create(cartData);
+                return newItem;
             }
-    
-            const newProducts = products.map(product => ({
-                productID: product.productID,
-                price: product.price,
-                quantity: product.quantity,
-                size: product.size,
-                color: product.color,
-            }));
-    
-            const updatedProducts = shoppingCart.products.map(cartProduct => {
-                const newProduct = newProducts.find(product => product.productID === cartProduct.productID);
-                if (newProduct) {
-                    return {
-                        ...cartProduct,
-                        quantity: cartProduct.quantity + newProduct.quantity
-                    };
-                }
-                return cartProduct;
-            });
-    
-            const remainingNewProducts = newProducts.filter(product => !updatedProducts.find(cartProduct => cartProduct.productID === product.productID));
-            updatedProducts.push(...remainingNewProducts);
-    
-            const updatedTotalAmount = this.calculateTotalAmount(updatedProducts);
-    
-            await shoppingCart.update({ 
-                products: updatedProducts,
-                totalAmount: updatedTotalAmount 
-            });
-    
-            return shoppingCart;
-    
         } catch (error) {
-            console.error('Error updating shopping cart:', error);
-            throw new Error('Could not update shopping cart');
+            console.error('Error adding item to cart:', error);
         }
     }
-    
 
-    getProductsFromShoppingCart = async (userId) => {
+    async getProductsFromShoppingCart(userId) {
         try {
-            const shoppingCart = await ShoppingCart.findOne({ where: { userId } });
+            const cartItems = await ShoppingCart.findAll({
+                where: { userId },
+                include: [{
+                    model: Product,
+                    include: [Image], // Incluye el modelo Image aquí
+                }],
+            });
+            return cartItems;
+        } catch (error) {
+            console.error('Error fetching cart items:', error);
+        }
+    }
 
-            if (!shoppingCart) {
-                console.log('User shopping cart not found');
+    async updateProductQuantityInShoppingCart(cartItemId, updatedData) {
+        try {
+            const [rowsUpdated, [updatedItem]] = await ShoppingCart.update(updatedData, {
+                where: { id: cartItemId },
+                returning: true,
+            });
+            if (rowsUpdated > 0) {
+                return updatedItem;
+            } else {
+                console.log('No se pudo actualizar el artículo del carrito.');
                 return null;
             }
-
-            return shoppingCart.dataValues;
         } catch (error) {
-            console.log(error);
+            console.error('Error updating cart item:', error);
         }
     }
 
-    updateProductQuantityInShoppingCart = async ({ userId, productId, quantity }) => {
+    async deleteProductFromShoppingCart(cartItemId) {
         try {
-            const shoppingCart = await ShoppingCart.findOne({ where: { userId } });
-    
-            if (!shoppingCart) {
-                console.log('Shopping cart not found');
+            const rowsDeleted = await ShoppingCart.destroy({
+                where: { id: cartItemId },
+            });
+            if (rowsDeleted > 0) {
+                return { message: 'Artículo eliminado del carrito exitosamente.' };
+            } else {
+                console.log('No se pudo eliminar el artículo del carrito.');
                 return null;
             }
-    
-            const updatedProducts = shoppingCart.products.map(product => {
-                if (product.productID === productId) {
-                    return {
-                        ...product,
-                        quantity: quantity
-                    };
-                }
-                return product;
-            });
-    
-            await shoppingCart.update({ products: updatedProducts });
-    
-            return shoppingCart;
         } catch (error) {
-            console.error('Error updating product quantity:', error);
-            throw new Error('Could not update product quantity');
+            console.error('Error removing cart item:', error);
         }
     }
 
-    deleteProductFromShoppingCart = async ({ userId, productId }) => {
+    async deleteShoppingCart(cartItemId) {
         try {
-            const shoppingCart = await ShoppingCart.findOne({ where: { userId } });
-    
-            if (!shoppingCart) {
-                console.log('User shopping cart not found');
+            const rowsDeleted = await ShoppingCart.destroy({
+                where: { userId: cartItemId },
+            });
+            if (rowsDeleted > 0) {
+                return { message: 'Carrito eliminado exitosamente.' };
+            } else {
+                console.log('No se pudo eliminar el carrito.');
                 return null;
             }
-    
-            const updatedProducts = shoppingCart.dataValues.products.filter(product => product.productID !== productId);
-            
-            if (updatedProducts.length === 0) {
-                await shoppingCart.destroy();
-                return null; // No products left in the shopping cart
-            }
-    
-            const updatedTotalAmount = this.calculateTotalAmount(updatedProducts);
-    
-            await shoppingCart.update({ 
-                products: updatedProducts,
-                totalAmount: updatedTotalAmount 
-            });
-    
-            return shoppingCart;
         } catch (error) {
-            console.error('Error deleting product from shopping cart:', error);
-            throw new Error('Could not delete product from shopping cart');
+            console.error('Error removing cart item:', error);
         }
-    }
-    
-    calculateTotalAmount = (products) => {
-        return products.reduce((total, product) => {
-            return total + (product.price * product.quantity);
-        }, 0);
     }
 }

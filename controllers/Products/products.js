@@ -24,21 +24,36 @@ export class ProductController {
     try {
       // Verificar caché de Redis primero
       const cachedProducts = await this.redisClient.get('allProducts');
-      if (cachedProducts) {
-        logger.info('Products retrieved from cache');
-        return res.status(200).json(JSON.parse(cachedProducts));
+      const cachedTimestamp = await this.redisClient.get('allProductsTimestamp');
+
+      // Verificar si hay caché y si no ha expirado
+      if (cachedProducts && cachedTimestamp) {
+        const currentTime = Date.now();
+        const cachedTime = parseInt(cachedTimestamp);
+        // Si la caché tiene menos de una hora
+        if (currentTime - cachedTime < 3600000) { // 3600000 ms = 1 hora
+          logger.info('Products retrieved from cache');
+          return res.status(200).json(JSON.parse(cachedProducts));
+        }
       }
 
-      // Si no está en caché, obtener de la base de datos
-      const products = await this.productModel.getAllProducts();
-      logger.info('Items obtained successfully');
+      logger.info('Products not found in cache, retrieving from database...');
 
-      // Guardar en caché para futuras solicitudes
-      await this.redisClient.set('allProducts', JSON.stringify(products), 'EX', 3600); // Caché por 1 hora
+      // Si no hay caché o ha expirado, obtener de la base de datos
+      const products = await this.productModel.getAllProducts();
+      logger.info('Items obtained from database');
+
+      // Guardar en caché los productos y la marca de tiempo
+      await Promise.all([
+        this.redisClient.set('allProducts', JSON.stringify(products)),
+        this.redisClient.set('allProductsTimestamp', Date.now().toString())
+      ]);
+      
+      logger.info('Products cached successfully');
       res.status(200).json(products);
     } catch (error) {
-      logger.error('Error obtaining items - Server error');
-      res.status(500).json({ error: `Error server: the items could not be obtained. Error message: ${error}` });
+      logger.error(`Error obtaining items: ${error.message}`);
+      res.status(500).json({ error: `Server error: items could not be obtained. ${error.message}` });
     }
   }
 
@@ -47,19 +62,34 @@ export class ProductController {
     try {
       // Verificar caché de Redis primero
       const cachedProduct = await this.redisClient.get(`product:${productId}`);
-      if (cachedProduct) {
-        logger.info(`Product obtained from cache - ${productId}`);
-        return res.status(200).json(JSON.parse(cachedProduct));
+      const cachedTimestamp = await this.redisClient.get(`product:${productId}:timestamp`);
+
+      // Verificar si hay caché y si no ha expirado
+      if (cachedProduct && cachedTimestamp) {
+        const currentTime = Date.now();
+        const cachedTime = parseInt(cachedTimestamp);
+
+        // Si la caché tiene menos de una hora
+        if (currentTime - cachedTime < 3600000) { // 3600000 ms = 1 hora
+          logger.info(`Product retrieved from cache - ${productId}`);
+          return res.status(200).json(JSON.parse(cachedProduct));
+        }
       }
 
-      // Si no está en caché, obtener de la base de datos
+      // Si no está en caché o ha expirado, obtener de la base de datos
       const product = await this.productModel.getProductById(productId);
       if (product) {
-        logger.info(`Product obtained successfully - ${productId}`);
-        // Guardar en caché
-        await this.redisClient.set(`product:${productId}`, JSON.stringify(product), 'EX', 3600);
+        logger.info(`Product obtained from database - ${productId}`);
+        
+        // Guardar en caché los productos y la marca de tiempo
+        await Promise.all([
+          this.redisClient.set(`product:${productId}`, JSON.stringify(product)),
+          this.redisClient.set(`product:${productId}:timestamp`, Date.now().toString())
+        ]);
+
         return res.status(200).json(product);
       }
+
       logger.warn(`Product not found ${productId}`);
       return res.status(404).json({ error: 'Product not found' });
     } catch (error) {
