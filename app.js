@@ -3,16 +3,18 @@ import cors from 'cors';
 import { createClient } from 'redis';
 import { mainRoutes } from './routes/mainRoutes.js';
 import syncDatabase from './models/postgres/mainModels.js';
+import { config } from 'dotenv';
+config();
 
 const redisClient = createClient({
-  password: 'tLbYmGhlgNJFmGJIcSpkM9dWjzRW8FgK',
+  password: process.env.REDIS_PASSWORD,
   socket: {
-    host: 'redis-12924.c258.us-east-1-4.ec2.redns.redis-cloud.com',
-    port: 12924
+    host: process.env.REDIS_HOST,
+    port: process.env.REDIS_PORT
   }
 });
 
-redisClient.on('error', (err) => console.log('Redis Client Error', err));
+redisClient.on('error', (err) => { if(err.code !== 'ENOTFOUND') console.log('Redis Client Error', err) });
 
 export const mainApp = async (models) => {
   const app = express();
@@ -40,7 +42,7 @@ export const mainApp = async (models) => {
 
   // Configuración del servidor y escucha del puerto
   if (!import.meta.main) {
-    const port = process.env.PORT || 4000;
+    const port = process.env.PORT || 3000;
     app.listen(port, () =>
       console.log(`La aplicación está corriendo en http://localhost:${port}`),
     );
