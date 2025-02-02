@@ -96,7 +96,7 @@ export class ProductModel {
         image: newImages,
       };
     } catch (error) {
-      console.log(error,);
+      console.log(error);
     }
   }
 
