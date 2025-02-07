@@ -10,7 +10,11 @@ export const verifyGoogleToken = async (token) => {
         const ticket = await admin.auth().verifyIdToken(token);
         return ticket;
     } catch (error) {
-        console.log(error);
+        console.error('Error verificando token:', {
+            message: error.message,
+            code: error.code,
+            projectId: serviceAccount.project_id
+        });
         return null;
     }
 }

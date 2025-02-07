@@ -10,7 +10,7 @@ export class ProductController {
     try {
       let { body } = req;
       const newProduct = await this.productModel.createProduct(body);
-      // Invalidar caché después de crear un nuevo producto
+
       await this.redisClient.del('allProducts');
       logger.info('A new product has been created');
       res.status(201).json({ info: newProduct });
@@ -22,16 +22,16 @@ export class ProductController {
 
   getAllProducts = async (req, res) => {
     try {
-      // Verificar caché de Redis primero
+
       const cachedProducts = await this.redisClient.get('allProducts');
       const cachedTimestamp = await this.redisClient.get('allProductsTimestamp');
 
-      // Verificar si hay caché y si no ha expirado
+
       if (cachedProducts && cachedTimestamp) {
         const currentTime = Date.now();
         const cachedTime = parseInt(cachedTimestamp);
-        // Si la caché tiene menos de una hora
-        if (currentTime - cachedTime < 3600000) { // 3600000 ms = 1 hora
+ 
+        if (currentTime - cachedTime < 3600000) { 
           logger.info('Products retrieved from cache');
           return res.status(200).json(JSON.parse(cachedProducts));
         }
@@ -39,11 +39,11 @@ export class ProductController {
 
       logger.info('Products not found in cache, retrieving from database...');
 
-      // Si no hay caché o ha expirado, obtener de la base de datos
+     
       const products = await this.productModel.getAllProducts();
       logger.info('Items obtained from database');
 
-      // Guardar en caché los productos y la marca de tiempo
+     
       await Promise.all([
         this.redisClient.set('allProducts', JSON.stringify(products)),
         this.redisClient.set('allProductsTimestamp', Date.now().toString())
@@ -60,28 +60,26 @@ export class ProductController {
   getProductById = async (req, res) => {
     const productId = req.params.id;
     try {
-      // Verificar caché de Redis primero
+    
       const cachedProduct = await this.redisClient.get(`product:${productId}`);
       const cachedTimestamp = await this.redisClient.get(`product:${productId}:timestamp`);
 
-      // Verificar si hay caché y si no ha expirado
       if (cachedProduct && cachedTimestamp) {
         const currentTime = Date.now();
         const cachedTime = parseInt(cachedTimestamp);
 
-        // Si la caché tiene menos de una hora
-        if (currentTime - cachedTime < 3600000) { // 3600000 ms = 1 hora
+       
+        if (currentTime - cachedTime < 3600000) { 
           logger.info(`Product retrieved from cache - ${productId}`);
           return res.status(200).json(JSON.parse(cachedProduct));
         }
       }
 
-      // Si no está en caché o ha expirado, obtener de la base de datos
+      
       const product = await this.productModel.getProductById(productId);
       if (product) {
         logger.info(`Product obtained from database - ${productId}`);
         
-        // Guardar en caché los productos y la marca de tiempo
         await Promise.all([
           this.redisClient.set(`product:${productId}`, JSON.stringify(product)),
           this.redisClient.set(`product:${productId}:timestamp`, Date.now().toString())
@@ -121,7 +119,7 @@ export class ProductController {
     try {
       const updatedProduct = await this.productModel.updateProductById({ updatedData, productId });
       if (updatedProduct) {
-        // Invalidar caché después de actualizar un producto
+       
         await this.redisClient.del(`product:${productId}`);
         await this.redisClient.del('allProducts');
         logger.info(`Product with id ${productId} has been updated successfully`);
@@ -141,7 +139,7 @@ export class ProductController {
     try {
       const deletedProduct = await this.productModel.deleteProductById(productId);
       if (deletedProduct) {
-        // Invalidar caché después de eliminar un producto
+      
         await this.redisClient.del(`product:${productId}`);
         await this.redisClient.del('allProducts');
         logger.info(`Product with id ${productId} has been deleted`);

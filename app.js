@@ -4,6 +4,7 @@ import { createClient } from 'redis';
 import { mainRoutes } from './routes/mainRoutes.js';
 import syncDatabase from './models/postgres/mainModels.js';
 import { config } from 'dotenv';
+import cookieParser from 'cookie-parser';
 config();
 
 const redisClient = createClient({
@@ -20,27 +21,34 @@ export const mainApp = async (models) => {
   const app = express();
   syncDatabase();
 
-  // Conectar a Redis
+
   await redisClient.connect();
 
-  // Configuración básica de Express
   app.enable('trust proxy');
   app.use(express.json());
+  app.use(cookieParser());
+  
 
-  // Configuración de CORS
+  const allowedOrigins = [
+    "http://localhost:4000", 
+    "https://discreta-seduccion.web.app", 
+  ];
+  
   const corsOptions = {
     origin: (origin, callback) => {
-      callback(null, true);
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, origin);
+      } else {
+        callback(new Error("No permitido por CORS"));
+      }
     },
-    credentials: true, // Permitir el envío de cookies
+    credentials: true, 
   };
   
   app.use(cors(corsOptions));
 
-  // Configuración de rutas principales
   mainRoutes(app, models, redisClient);
 
-  // Configuración del servidor y escucha del puerto
   if (!import.meta.main) {
     const port = process.env.PORT || 3000;
     app.listen(port, () =>
@@ -51,7 +59,7 @@ export const mainApp = async (models) => {
   return app;
 }
 
-// Manejo de cierre de la aplicación
+
 process.on('SIGINT', async () => {
   await redisClient.quit();
   process.exit(0);

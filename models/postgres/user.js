@@ -80,7 +80,6 @@ export class UserModel {
       },{
         attributes:  ['id', 'email', "firstName", "lastName", "isAdmin", "accountStatus", "lastLogin"],
       });
-      console.log(newUser)
       return newUser?.dataValues ?? null;
     } catch (error) {
       console.log(`Server error: Has been an error creating the user. Error Message: ${error}`);
@@ -96,7 +95,6 @@ export class UserModel {
     } catch (error) {
       console.log(`Error Sever: Has been an error getting the user. Error Message: ${error}`);
     }
-
   }
 
   async getUserById({ id }) {

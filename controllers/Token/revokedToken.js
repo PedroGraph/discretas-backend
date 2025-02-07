@@ -1,8 +1,6 @@
-import { RevokedToken } from '../../models/postgres/revokedToken.js'; // Ajusta la importación según tu estructura
-
+import { RevokedToken } from '../../models/postgres/revokedToken.js'; 
 const addRevokedToken = async (token) => {
     try {
-        // Agrega el token revocado a la base de datos
         await RevokedToken.create({ token });
         console.log(`Token revocado añadido: ${token}`);
         return true;
@@ -14,16 +12,8 @@ const addRevokedToken = async (token) => {
 
 const findRevokedToken = async (token) => {
     try {
-        // Busca el token revocado en la base de datos
         const revokedToken = await RevokedToken.findOne({ where: { token } });
-
-        if (revokedToken) {
-            console.log(`Token revocado encontrado: ${token}`);
-            return true; // El token está revocado
-        } else {
-            console.log(`Token no revocado: ${token}`);
-            return false; // El token no está revocado
-        }
+        return revokedToken && revokedToken.length > 0;
     } catch (error) {
         console.error('Error al buscar token revocado:', error);
         throw error;

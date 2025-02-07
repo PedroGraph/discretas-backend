@@ -2,14 +2,14 @@ import jwt from 'jsonwebtoken';
 import { findRevokedToken } from '../Token/revokedToken.js';
 
 const generateToken = (user) => {
-  return jwt.sign({ userId: user.id, isAdmin: user.isAdmin }, process.env.JWT_SECRET, { expiresIn: '12h' });
+  return jwt.sign({ userId: user.id, isAdmin: user.isAdmin }, `${process.env.JWT_SECRET}_${user.id}`, { expiresIn: '12h' });
 };
 
 const authenticateUser = async (req, res, next) => {
-  const token = req.headers.authorization;
+  const token = req.cookies.DSsessionId;
 
   if (!token) {
-    return res.status(401).json({ message: 'Token no proporcionado' });
+    return res.status(401).json({ message: 'Token no proporcionado. Tal vez no has iniciado sesión' });
   }
 
   const isTokenRevoked = await findRevokedToken(token);

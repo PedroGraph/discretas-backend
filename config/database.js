@@ -31,6 +31,7 @@ const createSequelizeInstance = (url = null) => {
 let sequelize;
 
 try {
+  console.log(`Conectado a ${DATABASE_URL}`)
   sequelize = createSequelizeInstance(DATABASE_URL);
   await sequelize.authenticate();
   console.log('Conectado a la base de datos usando DATABASE_URL.');

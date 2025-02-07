@@ -9,6 +9,7 @@ export class ShoppingController {
   addProductToShoppingCart = async (req, res) => {
     try {
       let { shoppingCartData } = req.body;
+      console.log(shoppingCartData)
       const shoppindCart = await this.shoppingModel.addProductToShoppingCart(shoppingCartData);
       const ProductInfo = await this.productModel.getProductById(shoppingCartData.productId);
       const newProduct = {
@@ -80,7 +81,7 @@ export class ShoppingController {
       const deletedProduct = await this.shoppingModel.deleteShoppingCart(shoppingCartId);
       if (deletedProduct) {
         logger.info(`Shopping cart with id ${shoppingCartId} has been deleted`);
-        return res.status(204).json({ info: 'Shopping cart deleted' });
+        return res.status(201).json({ info: 'Shopping cart deleted' });
       }
 
       logger.warn(`Shopping cart with id ${shoppingCartId} not found `);

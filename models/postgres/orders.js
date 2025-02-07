@@ -15,7 +15,7 @@ export const Order = sequelize.define('order', {
   },
   orderId: {
     type: DataTypes.STRING,
-    allowNull: false, // Permitimos valores repetidos
+    allowNull: false, 
     defaultValue: () => Math.floor(Math.random() * 9000000000) + 1000000000,
   },
   productId: {

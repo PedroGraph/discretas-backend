@@ -1,5 +1,5 @@
 import { generateToken } from '../Middleware/userMiddleware.js';
-import { addRevokedToken } from '../Token/revokedToken.js';
+import { addRevokedToken, findRevokedToken } from '../Token/revokedToken.js';
 import logger from '../../logCreator/log.js';
 import {passwordRecoveryCode} from '../../utils/generatePasswordCode.js';
 import { sendPasswordRecoveryEmail } from '../../utils/nodemails.js';
@@ -109,40 +109,76 @@ export class UserController {
 
   logout = async (req, res) => {
     try {
-      const token = req.cookies.sessionId;
+      const cookieInfo = req.headers.cookie;
+      const match = cookieInfo.match(/DSsessionId=([^;]+)/);
+      const token = match ? match[1] : null;
+      if(!token) return res.status(401).json({ message: 'Token no proporcionado.' });
+
       const isTokenRevoked = await findRevokedToken(token);
       if (!isTokenRevoked) await addRevokedToken(token);
-      res.clearCookie('sessionId');
-      logger.info('Logout successful: ', req.cookies.sessionId);
+
+      res.clearCookie('DSsessionId', {
+        path: "/",
+        domain: process.env.NODE_ENV === "production"
+          ? "discreta-seduccion.web.app"
+          : "localhost",
+        httpOnly: process.env.NODE_ENV === "production",
+        secure: process.env.NODE_ENV === "production",
+        sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      });
+      logger.info('Logout successful: ', req.cookies.DSsessionId);
+
       res.status(200).json({ message: 'Logout exitoso' });
     } catch (error) {
       logger.error('Error to logout:', error);
+      console.log(error)
       res.status(500).json({ message: 'Error en el servidor' });
     }
   }
 
   loginWithGoogle = async (req, res) => {
     try {
-
       const tokenId = req.body.idToken;
       const decodedToken = await verifyGoogleToken(tokenId);
       const uid = decodedToken.uid;
 
+      const user = await this.userModel.getUserInformation({email: req.body.email});
+      if (!user) {
+        return res.status(404).json({ 
+          success: false, 
+          error: 'Usuario no encontrado' 
+        });
+      }
+
       const token = generateToken(uid);
-
-      res.cookie('sessionId', token, {
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        secure: true,
-        sameSite: 'None',
+  
+      res.cookie('DSDSsessionId', token, {
+        maxAge: 7 * 24 * 60 * 60 * 1000, 
+        httpOnly: process.env.NODE_ENV === 'production', 
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+        path: '/',
+        domain: process.env.NODE_ENV === 'production' 
+          ? 'discreta-seduccion.web.app'
+          : 'localhost'
       });
-
-      logger.info('Login successful: ', uid);
-      res.json({ token });
-
+  
+      logger.info('Login successful:', uid);
+      res.json({ 
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+        }
+      });
+  
     } catch (error) {
-      console.error(error);
-      res.status(500).json({ success: false, error: 'Error en la autenticación de Google' });
+      logger.error('Login error:', error);
+      console.log(error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Error en la autenticación de Google' 
+      });
     }
   }
 
