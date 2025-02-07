@@ -9,7 +9,6 @@ const request = supertest(app);
 describe('API Tests', () => {
   let productId;
 
-  // Prueba para agregar un producto
   it('should add a new product', async () => {
     const productData = {
       productName: 'Nuevo Producto',
@@ -28,18 +27,16 @@ describe('API Tests', () => {
     .field(productData)
     .attach('image', imageFile.buffer, { filename: imageFile.originalname });
     expect(response.status).to.equal(201);
-    productId = response.body.info.product.id; // Almacena el ID del producto creado para usarlo en la siguiente prueba
+    productId = response.body.info.product.id; 
 
   });
 
-  // Prueba para obtener todos los productos
   it('should get all products', async () => {
     const response = await request.get('/api/products/all');
     expect(response.status).to.equal(200);
     expect(response.body).to.be.an('array');
   });
 
-  // Prueba para obtener un producto por su ID
   it('should get a product by ID', async () => {
     const response = await request.get(`/api/products/${productId}`);
     expect(response.status).to.equal(200);
@@ -47,7 +44,6 @@ describe('API Tests', () => {
     expect(response.body.id).to.equal(productId);
   });
 
-  // Prueba para actualizar un producto
   it('should update a product by ID', async () => {
     const updatedProductData = {
       productName: 'Nuevo Nombre del Producto',
@@ -60,7 +56,6 @@ describe('API Tests', () => {
     expect(response.body.info.id).to.equal(productId);
   });
 
-  // Prueba para borrar un producto
   it('should delete the new product was created', async () => {
     const response = await request
       .delete(`/api/products/delete/${productId}`)
@@ -70,7 +65,7 @@ describe('API Tests', () => {
     }catch (error) {
       console.error('Error in test:', error);
       console.log('Response body:', response.body);
-      throw error; // Re-throw the error to fail the test
+      throw error; 
     }
   });
   

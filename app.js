@@ -36,11 +36,7 @@ export const mainApp = async (models) => {
   
   const corsOptions = {
     origin: (origin, callback) => {
-      if (!origin || allowedOrigins.includes(origin)) {
         callback(null, origin);
-      } else {
-        callback(new Error("No permitido por CORS"));
-      }
     },
     credentials: true, 
   };
