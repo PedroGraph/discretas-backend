@@ -76,8 +76,6 @@ export class OrderController {
       const { date } = req.query;
 
       let getAllOrders = await this.orderModel.getAllOrders(userId, date);
-
-      console.log(getAllOrders)
   
       if (getAllOrders.length === 0) {
         logger.warn(`Orders by ${userId} were not found`);
