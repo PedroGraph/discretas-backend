@@ -27,21 +27,7 @@ export const mainApp = async (models) => {
   app.enable('trust proxy');
   app.use(express.json());
   app.use(cookieParser());
-  
-
-  const allowedOrigins = [
-    "http://localhost:4000", 
-    "https://discreta-seduccion.web.app", 
-  ];
-  
-  const corsOptions = {
-    origin: (origin, callback) => {
-        callback(null, origin);
-    },
-    credentials: true, 
-  };
-  
-  app.use(cors(corsOptions));
+  app.use(cors());
 
   mainRoutes(app, models, redisClient);
 

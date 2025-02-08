@@ -22,24 +22,62 @@ export class OrderController {
   getOrderById = async (req, res) => {
     try {
       const { orderId } = req.params;
-      const order = await this.orderModel.getOrderById(orderId);
-      if(!order) {
+      const orders = await this.orderModel.getOrderById(orderId);
+  
+      if (!orders || orders.length === 0) {
         logger.warn(`Order ${orderId} not found`);
         return res.status(404).json({ error: 'Order not found' });
       }
-      logger.info(`Order ${orderId} obtained successfully`);
-      return res.status(200).json(order);
+  
+      // Crear objeto para almacenar la orden formateada
+      const formattedOrder = {
+        orderId: orders[0].orderId,
+        shippingAddress: orders[0].shippingAddress,
+        createdAt: orders[0].createdAt,
+        products: []
+      };
+  
+      // Obtener información de productos
+      await Promise.all(
+        orders.map(async (order) => {
+          const { productId, quantity, size, color } = order;
+  
+          // Obtener información detallada del producto
+          const productInfo = await this.productModel.getProductById(productId);
+  
+          const product = {
+            name: productInfo.name,
+            id: productId,
+            category: productInfo.category,
+            color,
+            size,
+            price: productInfo.price,
+            quantity,
+            images: productInfo.images,
+          };
+  
+          formattedOrder.products.push(product);
+        })
+      );
+  
+      logger.info(`Order ${orderId} obtained successfully with product details`);
+      return res.status(200).json(formattedOrder);
     } catch (error) {
-      logger.error('Error obtaining items - Server error');
-      res.status(500).json({ error: `Error server: the items could not be obtained. Error message: ${error}` });
+      logger.error(`Error obtaining order - Server error. Error message: ${error}`);
+      res.status(500).json({ 
+        error: `Error server: the items could not be obtained. Error message: ${error}` 
+      });
     }
   }
-
+  
   getAllOrders = async (req, res) => {
     try {
       const { userId } = req.params;
       const { date } = req.query;
+
       let getAllOrders = await this.orderModel.getAllOrders(userId, date);
+
+      console.log(getAllOrders)
   
       if (getAllOrders.length === 0) {
         logger.warn(`Orders by ${userId} were not found`);
