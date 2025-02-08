@@ -34,7 +34,8 @@ export class OrderController {
         orderId: orders[0].orderId,
         shippingAddress: orders[0].shippingAddress,
         createdAt: orders[0].createdAt,
-        products: []
+        products: [],
+        paymentId: orders[0].paymentId,
       };
   
       // Obtener información de productos
