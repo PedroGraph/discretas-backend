@@ -107,9 +107,8 @@ export class PaymentModel {
   // Método para obtener un pago por su ID
   getPaymentById = async (paymentId) => {
     try {
-      const payment = await Payment.findOne({
-        where: { paymentId: paymentId }
-      });
+      console.log(paymentId);
+      const payment = await Payment.findByPk(paymentId);
       return payment;
     } catch (error) {
       console.log(error);

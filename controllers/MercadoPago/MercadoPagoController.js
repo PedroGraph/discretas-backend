@@ -1,8 +1,9 @@
 import logger from '../../logCreator/log.js';
 
 export class MercadoPagoController {
-    constructor(mercadoPagoModel) {
+    constructor(mercadoPagoModel, paymentModel) {
         this.mercadoPagoModel = mercadoPagoModel;
+        this.paymentModel = paymentModel;
     }
 
     createPayment = async (req, res) => {
@@ -15,6 +16,19 @@ export class MercadoPagoController {
             logger.error('Error to create payment:', error);
             res.status(500).json({ message: error });
             console.log('Error to create payment:', error);
+        }
+    };
+
+    getPaymentInfoById = async (req, res) => {
+        try {
+            const paymentId = req.params.id;
+            const paymentInfo = await this.paymentModel.getPaymentById(paymentId);
+            if (paymentInfo) return res.status(200).json(paymentInfo);
+            else return res.status(404).json({ message: 'Payment not found' });
+            // logger.info('Getting payment by ID:', payment.id);
+        } catch (error) {
+            logger.error('Error to get payment by ID:', error);
+            res.status(500).json({ message: 'Error en el servidor' });
         }
     };
 }
