@@ -101,7 +101,6 @@ export class ProductController {
       const { query } = req;
       const products = await this.productModel.getProductsWithFilters(query);
       if (products) {
-        console.log(products.length)
         logger.info("Products filtered successfully");
         return res.status(200).json(products);
       }
