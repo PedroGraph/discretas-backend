@@ -2,7 +2,6 @@ import { RevokedToken } from '../../models/postgres/revokedToken.js';
 const addRevokedToken = async (token) => {
     try {
         await RevokedToken.create({ token });
-        console.log(`Token revocado añadido: ${token}`);
         return true;
     } catch (error) {
         console.error('Error al añadir token revocado:', error);
