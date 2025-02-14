@@ -7,6 +7,9 @@ import { Order } from "./orders.js";
 import { UsedDiscountCode } from "./usedDiscountCodes.js";
 import { DiscountCode } from "./discountCodes.js";
 import { Payment } from "./payment.js";
+import { Address } from "./address.js";
+import { Notifications } from "./notifications.js";
+import { Wishlist } from "./wishlist.js";
 
 async function syncDatabase() {
     try {
@@ -20,6 +23,9 @@ async function syncDatabase() {
         await DiscountCode.sync({ force: false });
         await UsedDiscountCode.sync({ force: false });
         await Payment.sync({ force: false });
+        await Address.sync({ force: false });
+        await Notifications.sync({ force: false });
+        await Wishlist.sync({ force: false });
         console.log('Base de datos sincronizada correctamente.');
     } catch (error) {
         console.error('Error al sincronizar la base de datos:', error);

@@ -6,14 +6,16 @@ import { sendPasswordRecoveryEmail } from '../../utils/nodemails.js';
 import { verifyGoogleToken } from '../../models/google/googleAdmin.js';
 
 export class UserController {
-  constructor(userModel) {
+  constructor(userModel, notificationModel) {
     this.userModel = userModel;
+    this.notificationModel = notificationModel;
   }
 
   createUser = async (req, res) => {
     try {
       const userInfo = req.body;
       const newUser = await this.userModel.createUser(userInfo);
+      await this.notificationModel.addNotificationToUser({ userId: newUser.id });
       logger.info('A new user has been created');
       if (newUser) res.status(201).json({ info: newUser });
     } catch (error) {
@@ -266,4 +268,40 @@ export class UserController {
     }
   }
 
+  getNotificationsByUserId = async (req, res) => {  
+    try {
+      const { userId } = req.params;
+      const notifications = await this.notificationModel.getNotificationsByUserId(userId);
+      if (!notifications) {
+        logger.warn(`Notifications not found for user ${userId}`);
+        return res.status(404).json({ error: 'Notifications not found' });
+      }
+      logger.info(`Notifications found for user ${userId}`);
+      return res.status(200).json(notifications);
+    } catch (error) {
+      logger.error(`Error obtaining notifications - Server error. Error message: ${error}`);
+      res.status(500).json({
+        error: `Error server: the notifications could not be obtained. Error message: ${error}`,
+      });
+    }
+  }
+
+  updateNotificationById = async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const updatedNotification = req.body;
+
+      const response = await this.notificationModel.updateNotificationById(userId, updatedNotification);
+      if (response) {
+        logger.info(`Notification ${userId} updated successfully`);
+        return res.status(200).json(updatedNotification);
+      }
+      logger.warn(`Notification ${userId} not updated`);
+      return res.status(404).json({ error: 'Notification not found' });
+    }
+    catch (error) {
+      logger.error(`Error updating notification ${userId} - Server error`);
+      res.status(500).json({ error: `Error server: the notification could not be updated. Error message. ${error}` });
+    }
+  }
 }

@@ -3,9 +3,9 @@ import { Router } from 'express';
 import { authenticateUser } from '../controllers/Middleware/userMiddleware.js';
 import { UserController } from '../controllers/Users/user.js';
 
-export const creatingUserRouter = ({ userModel }) => {
+export const creatingUserRouter = ({ userModel, notificationModel }) => {
 
-    const userController = new UserController(userModel);
+    const userController = new UserController(userModel, notificationModel);
     const userRouter = Router();
     // Rutas CRUD
     userRouter.post('/signup', userController.createUser);
@@ -24,7 +24,9 @@ export const creatingUserRouter = ({ userModel }) => {
     userRouter.post('/verify-code', userController.verifyPasswordRecoveryCode);
     userRouter.post('/change-password', userController.changePassword);
 
-    // Ruta para cambiar la contraseña
+    // Ruta para obtener las notificaciones de un usuario
+    userRouter.get('/notifications/:userId', userController.getNotificationsByUserId);
+    userRouter.put('/notifications/:userId', userController.updateNotificationById);
 
     return userRouter;
 
