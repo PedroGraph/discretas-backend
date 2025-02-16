@@ -3,9 +3,9 @@ import { Router } from 'express';
 import { authenticateUser } from '../controllers/Middleware/userMiddleware.js';
 import { UserController } from '../controllers/Users/user.js';
 
-export const creatingUserRouter = ({ userModel, notificationModel }) => {
+export const creatingUserRouter = ({ userModel, notificationModel, addressModel }) => {
 
-    const userController = new UserController(userModel, notificationModel);
+    const userController = new UserController(userModel, notificationModel, addressModel);
     const userRouter = Router();
     // Rutas CRUD
     userRouter.post('/signup', userController.createUser);

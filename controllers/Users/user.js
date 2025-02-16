@@ -6,9 +6,10 @@ import { sendPasswordRecoveryEmail } from '../../utils/nodemails.js';
 import { verifyGoogleToken } from '../../models/google/googleAdmin.js';
 
 export class UserController {
-  constructor(userModel, notificationModel) {
+  constructor(userModel, notificationModel, addressModel) {
     this.userModel = userModel;
     this.notificationModel = notificationModel;
+    this.addressModel = addressModel;
   }
 
   createUser = async (req, res) => {
@@ -46,9 +47,17 @@ export class UserController {
       const userInfo = req.params.id;
       if(userInfo.includes('@')) user = await this.userModel.getUserInformation({email: userInfo});
       else user = await this.userModel.getUserById({ id: userInfo });
-      if (user) res.status(200).json(user);
+      
+      if (user) {
+        const addresses = await this.addressModel.getAddressesByUserId(user.id);
+        const defaultAddress = addresses.find(address => address.default);
+        user.address = defaultAddress.street;
+        user.city = defaultAddress.city;
+        user.state = defaultAddress.state;
+        user.phoneNumber = defaultAddress.phone;
+        res.status(200).json(user);
+      }
       else res.status(404).json({ message: 'User not found' });
-      // logger.info('Getting user by ID:', user.id);
     } catch (error) {
       logger.error('Error to get user by ID:', error);
       res.status(500).json({ message: 'Error en el servidor' });

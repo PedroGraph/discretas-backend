@@ -23,7 +23,7 @@ export const mainRoutes = (app, models, redis) => {
     } = models;
 
     app.use('/api/products', createProductRouter({ productModel }, redis));
-    app.use('/api/users', creatingUserRouter({ userModel, notificationModel }));
+    app.use('/api/users', creatingUserRouter({ userModel, notificationModel, addressModel }));
     app.use('/api/shopping', creatingShoppingCartRouter({ shoppingCartModel, productModel }));
     app.use('/api/orders', creatingOrders({ orderModel, productModel }));
     app.use('/api/discounts', verifyDiscounts({ discountCodeModel, usedDiscountCodeModel }));

@@ -40,6 +40,10 @@ export const Address = sequelize.define('address', {
         type: DataTypes.ENUM('hogar', 'apartamento'),
         allowNull: false,
     },
+    default: {
+        type: DataTypes.BOOLEAN,
+        defaultValue: false,
+    },
 });
 
 Address.belongsTo(User, { foreignKey: 'userId', targetKey: 'id' });

@@ -36,10 +36,21 @@ export class AddressController {
     }
 
     updateAddressById = async (req, res) => {
+
         const { addressId } = req.params;
-        const updatedAddress = req.body;
+        const infoToUpdate = req.body;
+
         try {
-            const updatedAddress = await this.addressesModel.updateAddressById(addressId, updatedAddress);
+            const allAddresses = await this.addressesModel.getAddressesByUserId(addressId);
+            if(allAddresses.length > 0) {
+                allAddresses.forEach(async (address) => {
+                    if(address.default && infoToUpdate.default && address.id !== infoToUpdate.id) {
+                        address.default = false;
+                        await this.addressesModel.updateAddressById(address.id, address);
+                    }
+                });
+            }
+            const updatedAddress = await this.addressesModel.updateAddressById(infoToUpdate.id, infoToUpdate);
             if (updatedAddress) {
                 logger.info(`Address ${addressId} updated successfully`);
                 return res.status(200).json(updatedAddress);
