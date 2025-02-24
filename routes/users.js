@@ -1,6 +1,7 @@
 
 import { Router } from 'express';
-import { authenticateUser } from '../controllers/Middleware/userMiddleware.js';
+import { validateCreateUser, validateUpdateUser, validateLogin, validateChangePassword } from '../middlewares/validateUser.js';
+import { validateCreateNotification, validateUpdateNotification } from '../middlewares/validateNotification.js';
 import { UserController } from '../controllers/Users/user.js';
 
 export const creatingUserRouter = ({ userModel, notificationModel, addressModel }) => {
@@ -8,25 +9,25 @@ export const creatingUserRouter = ({ userModel, notificationModel, addressModel 
     const userController = new UserController(userModel, notificationModel, addressModel);
     const userRouter = Router();
     // Rutas CRUD
-    userRouter.post('/signup', userController.createUser);
+    userRouter.post('/signup', validateCreateUser, userController.createUser);
     userRouter.get('/all', userController.getAllUsers);
     userRouter.get('/getuser/:id', userController.getUserById);
-    userRouter.put('/updateuser/:id',  userController.updateUserById);
+    userRouter.put('/updateuser/:id',  validateUpdateUser, userController.updateUserById);
     userRouter.delete('/deleteuser/:id',  userController.deleteUserById);
 
     // Ruta de inicio y cierre de sesión
-    userRouter.post('/login', userController.login);
+    userRouter.post('/login', validateLogin, userController.login);
     userRouter.post('/googleLogin', userController.loginWithGoogle);
     userRouter.post('/logout', userController.logout);
 
     // Ruta para la recuperación de la contrasenya
     userRouter.post('/reset-password', userController.passwordRecovery);
     userRouter.post('/verify-code', userController.verifyPasswordRecoveryCode);
-    userRouter.post('/change-password', userController.changePassword);
+    userRouter.post('/change-password', validateChangePassword, userController.changePassword);
 
     // Ruta para obtener las notificaciones de un usuario
-    userRouter.get('/notifications/:userId', userController.getNotificationsByUserId);
-    userRouter.put('/notifications/:userId', userController.updateNotificationById);
+    userRouter.get('/notifications/:userId', validateCreateNotification, userController.getNotificationsByUserId);
+    userRouter.put('/notifications/:userId', validateUpdateNotification, userController.updateNotificationById);
 
     return userRouter;
 

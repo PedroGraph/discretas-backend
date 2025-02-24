@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import authMiddleware from '../controllers/Middleware/middleware.js';
 import { MercadoPagoController } from '../controllers/MercadoPago/MercadoPagoController.js';
 
 export const mercadoPagoRoute = ({ MercadoPagoModel, PaymentModel }) => {

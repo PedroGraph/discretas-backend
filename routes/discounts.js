@@ -1,5 +1,4 @@
 import { Router } from 'express';
-import authMiddleware from '../controllers/Middleware/middleware.js';
 import { DiscountsController } from '../controllers/Discounts/discounts.js';
 
 export const verifyDiscounts = ({ usedDiscountCodeModel, discountCodeModel }) => {

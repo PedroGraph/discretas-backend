@@ -1,5 +1,4 @@
 import  { Router } from 'express';
-import authMiddleware from '../controllers/Middleware/middleware.js';
 import { WishlistController } from '../controllers/Wishlist/wishlist.js';
 
 export const creatingWishlist = ({ wishlistModel, productModel }) => {

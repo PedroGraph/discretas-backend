@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import authMiddleware from '../controllers/Middleware/middleware.js';
 import { ProductController } from '../controllers/Products/products.js';
+import { validateCreateProduct, validateUpdateProduct } from '../middlewares/validateProduct.js';
 
 export const createProductRouter = ({ productModel }, redis) => {
 
@@ -9,10 +9,10 @@ export const createProductRouter = ({ productModel }, redis) => {
     const { createProduct, getAllProducts, getProductById, updateProduct, deleteProduct, getProductsWithFilters } = productController;
 
     productsRouter.get('/filters', getProductsWithFilters);
-    productsRouter.post('/create', createProduct);
+    productsRouter.post('/create', validateCreateProduct, createProduct);
     productsRouter.get('/all', getAllProducts);
     productsRouter.get('/:id', getProductById);
-    productsRouter.put('/update/:id', updateProduct);
+    productsRouter.put('/update/:id', validateUpdateProduct, updateProduct);
     productsRouter.delete('/delete/:productId', deleteProduct);
 
     return productsRouter;

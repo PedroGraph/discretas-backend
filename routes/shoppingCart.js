@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import authMiddleware from '../controllers/Middleware/middleware.js';
+import { validateCreateCartItem, validateUpdateCartItem } from '../middlewares/validateShoppingCart.js';
 import { ShoppingController } from '../controllers/Shopping/ShoppingCart.js';
 
 export const creatingShoppingCartRouter = ({ shoppingCartModel, productModel }) => {
@@ -8,9 +8,9 @@ export const creatingShoppingCartRouter = ({ shoppingCartModel, productModel }) 
     const shoppingController = new ShoppingController(shoppingCartModel, productModel);
     const { addProductToShoppingCart, getProductsFromShoppingCart, updateProductIntoShoppingCart, deleteProductFromShoppingCart, deleteShoppingCart } = shoppingController;
 
-    shoppingRouter.post('/create', addProductToShoppingCart);
+    shoppingRouter.post('/create', validateCreateCartItem, addProductToShoppingCart);
     shoppingRouter.get('/all/:userId', getProductsFromShoppingCart);
-    shoppingRouter.put('/update/:id', updateProductIntoShoppingCart);
+    shoppingRouter.put('/update/:id' , validateUpdateCartItem, updateProductIntoShoppingCart);
     shoppingRouter.delete('/delete/product/:id', deleteProductFromShoppingCart);
     shoppingRouter.delete('/delete/cart/:id', deleteShoppingCart);
 

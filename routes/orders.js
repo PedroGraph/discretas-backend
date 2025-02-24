@@ -1,6 +1,6 @@
 import { Router } from 'express';
-import authMiddleware from '../controllers/Middleware/middleware.js';
 import { OrderController } from '../controllers/Orders/Order.js';
+import { validateCreateOrder } from '../middlewares/validateOrder.js';
 
 export const creatingOrders = ({ orderModel, productModel }) => {
 
@@ -8,7 +8,7 @@ export const creatingOrders = ({ orderModel, productModel }) => {
     const orderController = new OrderController(orderModel, productModel);
     const { getAllOrders, getOrderById, createNewOrder } = orderController;
 
-    orderRouter.post('/create', createNewOrder);
+    orderRouter.post('/create', validateCreateOrder, createNewOrder);
     orderRouter.get('/all/:userId', getAllOrders);
     orderRouter.get('/:orderId', getOrderById);
 

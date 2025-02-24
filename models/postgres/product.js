@@ -75,12 +75,10 @@ Product.beforeUpdate((product) => {
 });
 
 export class ProductModel {
-  // Crear un nuevo producto con una imagen
   createProduct = async (productData) => {
     try {
       const {productImages, ...productDataWithoutImages} = productData;
       const newProduct = await Product.create(productDataWithoutImages);
-      // Asocia la imagen al producto
       const promises = productImages.map(async (image) => {
         const newImages = await Image.create({
           imageName: image,
@@ -100,24 +98,32 @@ export class ProductModel {
     }
   }
 
-  // Obtener todos los productos con sus imágenes
-  getAllProducts = async () => {
+  getAllProducts = async (query = {}) => {
     try {
-      const allProducts = await Product.findAll({
-        include: [{ model: Image }],
-      });
-      const products = allProducts.map((product) => {
+        const { page = 1, limit = 10 } = query;
+        const offset = page > 1 ? (page - 1) * limit : 0;
+
+        const { count, rows: allProducts } = await Product.findAndCountAll({
+          include: [{ model: Image }],
+          limit: parseInt(limit, 10),
+          offset: parseInt(offset, 10),
+        });
+
+        const products = allProducts.map((product) => ({
+            ...product.dataValues,
+        }));
+
         return {
-          ...product.dataValues,
-        }
-      });
-      return transformProducts(products);
+          products: transformProducts(products),
+          page: parseInt(page, 10),
+          totalPages: Math.ceil(count / limit)
+        };
+
     } catch (error) {
-      console.log(error);
+        console.log(error);
     }
   }
 
-  // Obtener un producto por su ID con su imagen
   getProductById = async (productId) => {
     try {
       const product = await Product.findByPk(productId, {
@@ -130,9 +136,7 @@ export class ProductModel {
       console.log(error);
     }
   }
-
-  // Actualizar un producto por su ID
-  updateProductById = async ({productId, updatedData}) => {
+   updateProductById = async ({productId, updatedData}) => {
     try {
 
       const [rowsUpdated, [updatedProduct]] = await Product.update(updatedData, {
@@ -159,6 +163,9 @@ export class ProductModel {
       const options = {
         ...(restFilters ? { where: restFilters } : {}),
         ...(orderBy ? { order: [orderBy.split("-")] } : {}),
+        include: [{ model: Image }],
+        limit: parseInt(limit || 10, 10),
+        offset: parseInt((page || 1) - 1, 10) * parseInt(limit || 10, 10) || 0,
       }
       const products = await Product.findAll({ ...options, include: [{ model: Image }] });
       const formattedProducts = products.map((product) => {
@@ -172,7 +179,6 @@ export class ProductModel {
     }
   }
 
-  // Eliminar un producto por su ID
   deleteProductById = async (productId) => {
     try {
       const deletedProduct = await Product.destroy({
