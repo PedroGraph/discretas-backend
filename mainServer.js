@@ -11,18 +11,30 @@ import { AddressModel } from "./models/postgres/address.js";
 import { WishlistModel } from "./models/postgres/wishlist.js";
 import { NotificationsModel } from "./models/postgres/notifications.js";
 
-const app = mainApp({ 
-    productModel: new ProductModel(), 
-    userModel: new UserModel(),
-    shoppingCartModel: new ShoppingCartModel(),
-    orderModel: new OrderModel(),
-    discountCodeModel: new DiscountCodeModel(),
-    usedDiscountCodeModel: new UsedDiscountCodeModel(),
-    mercadoPagoModel: new MercadoPagoModel(),
-    paymentModel: new PaymentModel(),
-    addressModel: new AddressModel(),
-    wishlistModel: new WishlistModel(),
-    notificationModel: new NotificationsModel()
-});
+const startServer = async () => {
+  try {
+    const app = await mainApp({ 
+      productModel: new ProductModel(), 
+      userModel: new UserModel(),
+      shoppingCartModel: new ShoppingCartModel(),
+      orderModel: new OrderModel(),
+      discountCodeModel: new DiscountCodeModel(),
+      usedDiscountCodeModel: new UsedDiscountCodeModel(),
+      mercadoPagoModel: new MercadoPagoModel(),
+      paymentModel: new PaymentModel(),
+      addressModel: new AddressModel(),
+      wishlistModel: new WishlistModel(),
+      notificationModel: new NotificationsModel()
+    });
 
-export default app
+    console.log("🚀 Servidor iniciado correctamente");
+
+    return app;
+  } catch (error) {
+    console.error("❌ Error al iniciar el servidor:", error);
+    process.exit(1);
+  }
+};
+
+const app = await startServer(); 
+export default app;

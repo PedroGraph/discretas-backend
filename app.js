@@ -21,8 +21,7 @@ export const mainApp = async (models) => {
   const app = express();
   syncDatabase();
 
-
-  await redisClient.connect();
+  await redisClient.connect((err) => { if(err) console.log('Redis Client Error', err) });
 
   app.enable('trust proxy');
   app.use(express.json());
@@ -34,12 +33,11 @@ export const mainApp = async (models) => {
 
   mainRoutes(app, models, redisClient);
 
-  if (!import.meta.main) {
-    const port = process.env.PORT || 3000;
-    app.listen(port, () =>
-      console.log(`La aplicación está corriendo en http://localhost:${port}`),
-    );
-  }
+  const port = process.env.PORT || 3000;
+  app.listen(port, () =>
+    console.log(`La aplicación está corriendo en http://localhost:${port}`),
+  );
+  
 
   return app;
 }
