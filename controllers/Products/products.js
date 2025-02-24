@@ -22,34 +22,8 @@ export class ProductController {
 
   getAllProducts = async (req, res) => {
     try {
-
-      const cachedProducts = await this.redisClient.get('allProducts');
-      const cachedTimestamp = await this.redisClient.get('allProductsTimestamp');
-
-
-      if (cachedProducts && cachedTimestamp) {
-        const currentTime = Date.now();
-        const cachedTime = parseInt(cachedTimestamp);
- 
-        if (currentTime - cachedTime < 3600000) { 
-          logger.info('Products retrieved from cache');
-          return res.status(200).json(JSON.parse(cachedProducts));
-        }
-      }
-
-      logger.info('Products not found in cache, retrieving from database...');
-
-     
-      const products = await this.productModel.getAllProducts();
+      const products = await this.productModel.getAllProducts(req.query);
       logger.info('Items obtained from database');
-
-     
-      await Promise.all([
-        this.redisClient.set('allProducts', JSON.stringify(products)),
-        this.redisClient.set('allProductsTimestamp', Date.now().toString())
-      ]);
-      
-      logger.info('Products cached successfully');
       res.status(200).json(products);
     } catch (error) {
       logger.error(`Error obtaining items: ${error.message}`);
