@@ -26,7 +26,7 @@ export const creatingUserRouter = ({ userModel, notificationModel, addressModel 
     userRouter.post('/change-password', validateChangePassword, userController.changePassword);
 
     // Ruta para obtener las notificaciones de un usuario
-    userRouter.get('/notifications/:userId', validateCreateNotification, userController.getNotificationsByUserId);
+    userRouter.get('/notifications/:userId', userController.getNotificationsByUserId);
     userRouter.put('/notifications/:userId', validateUpdateNotification, userController.updateNotificationById);
 
     return userRouter;

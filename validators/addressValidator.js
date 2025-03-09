@@ -38,7 +38,7 @@ export const addressSchema = Joi.object({
     }),
 
   zip: Joi.string()
-    .pattern(/^\d{5}(-\d{4})?$/)
+    .pattern(/^\d{6}(-\d{4})?$/)
     .required()
     .messages({
       'string.pattern.base': 'ZIP code must be in format 12345 or 12345-6789',

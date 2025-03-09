@@ -28,30 +28,56 @@ const orderItemSchema = Joi.object({
       'number.integer': 'Quantity must be an integer',
       'number.min': 'Quantity must be at least 1',
       'any.required': 'Quantity is required'
+  }),
+
+  productName: Joi.string()
+  .required()
+  .messages({
+    'string.empty': 'Product name cannot be empty',
+    'any.required': 'Product name is required'
+  }),
+
+  productPrice: Joi.number()
+    .integer()
+    .min(0)
+    .required()
+    .messages({
+      'number.base': 'Product price must be a number',
+      'number.integer': 'Product price must be an integer',
+      'number.min': 'Product price cannot be negative',
+      'any.required': 'Product price is required'
     }),
+
+  productCategory: Joi.string()
+    .required()
+    .messages({
+      'string.empty': 'Product category cannot be empty',
+      'any.required': 'Product category is required'
+    }),
+
+    images: Joi.array()
+    .items(Joi.string().uri())
+    .required()
+    .messages({
+      'array.base': 'Product images must be an array',
+      'string.base': 'Each product image must be a string',
+      'any.required': 'At least one product image is required',
+      'string.uri': 'Each product image must be a valid URL'
+    }),
+  
 
   size: Joi.string()
-    .required()
-    .messages({
-      'string.empty': 'Size cannot be empty',
-      'any.required': 'Size is required'
-    }),
+    .allow('')
+    .allow(null),
 
   color: Joi.string()
-    .required()
-    .messages({
-      'string.empty': 'Color cannot be empty',
-      'any.required': 'Color is required'
-    }),
+    .allow('')
+    .allow(null),
 
   discount: Joi.number()
-    .min(0)
-    .max(100)
-    .messages({
-      'number.base': 'Discount must be a number',
-      'number.min': 'Discount cannot be negative',
-      'number.max': 'Discount cannot be greater than 100'
-    })
+    .allow(null)
+    .allow('')
+    .allow(0)
 });
 
 export const orderSchema = Joi.object({

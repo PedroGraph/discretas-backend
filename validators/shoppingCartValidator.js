@@ -31,28 +31,17 @@ export const shoppingCartSchema = Joi.object({
     }),
 
   size: Joi.string()
-    .required()
-    .messages({
-      'string.empty': 'Size cannot be empty',
-      'any.required': 'Size is required'
-    }),
+    .allow(null)
+    .allow(''),
 
   color: Joi.string()
-    .required()
-    .messages({
-      'string.empty': 'Color cannot be empty',
-      'any.required': 'Color is required'
-    }),
+  .allow(null)
+  .allow(''),
 
   discount: Joi.number()
-    .min(0)
-    .max(100)
-    .default(0)
-    .messages({
-      'number.base': 'Discount must be a number',
-      'number.min': 'Discount cannot be negative',
-      'number.max': 'Discount cannot be greater than 100'
-    })
+    .allow(null)
+    .allow('')
+    .allow(0)
 });
 
 export const shoppingCartUpdateSchema = Joi.object({

@@ -3,7 +3,7 @@ import logger from '../logCreator/log.js';
 
 export const validateCreateCartItem = async (req, res, next) => {
   try {
-    await shoppingCartSchema.validateAsync(req.body, { abortEarly: false });
+    await shoppingCartSchema.validateAsync(req.body.shoppingCartData, { abortEarly: false });
     next();
   } catch (error) {
     logger.error('Validation error on shopping cart item creation:', error.details);
