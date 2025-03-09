@@ -84,7 +84,7 @@ export class OrderModel {
       const orders = await Order.findAll({
         where: { orderId },
       });
-      return orders;
+      return orders.map((order) => order.dataValues);
     } catch (error) {
       console.error(error);
       throw error;

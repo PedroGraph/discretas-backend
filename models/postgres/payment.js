@@ -108,7 +108,7 @@ export class PaymentModel {
   getPaymentById = async (paymentId) => {
     try {
       const payment = await Payment.findByPk(paymentId);
-      return payment;
+      return payment.dataValues;
     } catch (error) {
       console.log(error);
     }

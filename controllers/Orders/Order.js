@@ -1,9 +1,12 @@
 import logger from '../../logCreator/log.js';
+import { sendReceiptEmail } from '../../utils/nodemails.js';
 
 export class OrderController {
-  constructor( orderModel, productModel ) {
+  constructor( orderModel, productModel, userModel, paymentModel ) {
     this.orderModel = orderModel;
     this.productModel = productModel;
+    this.userModel = userModel;
+    this.paymentModel = paymentModel;
   }
 
   createNewOrder = async (req, res) => {
@@ -128,4 +131,76 @@ export class OrderController {
       });
     }
   }
+
+  generateOrderReceipt = async (req, res) => {
+    try {
+      const { orderId } = req.params;
+      const orderProducts = await this.orderModel.getOrderById(orderId);
+
+      if (!orderProducts || orderProducts.length === 0) {
+        logger.warn(`Order ${orderId} not found`);
+        return res.status(404).json({ error: 'Order not found' });
+      }
+
+      let totalPrice = 0;
+      let totalDiscount = 0;
+
+      const products = await Promise.all(
+        orderProducts.map(async (orderProduct) => {
+          const { productId, quantity, size, color, discount } = orderProduct;
+          const productInfo = await this.productModel.getProductById(productId);
+
+          const product = {
+            name: productInfo.name,
+            price: productInfo.price,
+            quantity,
+            size,
+            color,
+            discount,
+          };
+
+          totalPrice += product.price * quantity;
+          if (discount > 0) {
+            totalDiscount += (product.price * quantity) * (discount / 100);
+          }
+
+          return product;
+        })
+      );
+
+      const discount = totalPrice * orderProducts[0].discount;
+      const userInfo = await this.userModel.getUserById({id: orderProducts[0].userId});
+      const paymentInfo = await this.paymentModel.getPaymentById(orderProducts[0].paymentId);
+
+      const response = {
+        orderId,
+        products,
+        orderDate: new Date(orderProducts[0].createdAt).toLocaleString(),
+        orderStreet: orderProducts[0].shippingAddress.address,
+        orderCity: orderProducts[0].shippingAddress.city,
+        orderState: orderProducts[0].shippingAddress.state,
+        orderName: userInfo.firstName + " " + userInfo.lastName,
+        orderEmail: userInfo.email,
+        orderPhone: userInfo.phoneNumber,
+        orderNumbersCard: paymentInfo.cardLastFourDigits,
+        orderNumbersCardHolder: paymentInfo.cardholderName,
+        totalDiscount: discount > 0 ? discount : discount,
+        subTotal: totalPrice,
+        total: totalPrice,
+        TrackingURL: `http://localhost:4000/ordernes/${orderId}`,
+      };
+
+      const receipt = await sendReceiptEmail(response);
+
+      logger.info(`Order ${orderId} receipt generated successfully`);
+      return res.download(receipt, `receipt-${orderId}.pdf`, (err) => {
+        if (err) logger.error(`Error downloading receipt - Server error. Error message: ${err}`);
+      });
+    } catch (error) {
+      logger.error(`Error generating order receipt - Server error. Error message: ${error}`);
+      res.status(500).json({
+        error: `Error server: the receipt could not be generated. Error message: ${error}`,
+      });
+    }
+  };
 }
