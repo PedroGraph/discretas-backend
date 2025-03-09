@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recibo de tu compra en Lencería Elegante</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        a{
+            text-decoration: none !important;
+        }
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            background-color: #000;
+            color: #ffffff;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            padding: 20px;
+        }
+        .footer {
+            background-color: #f8f9fa;
+            padding: 20px;
+            text-align: center;
+            font-size: 12px;
+            color: #666;
+        }
+        h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        .button {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #8b5cf6;
+            color: #ffffff !important;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+        .order-summary {
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+        }
+        .social-links {
+            margin-top: 20px;
+        }
+        .social-links a {
+            display: inline-block;
+            margin: 0 10px;
+            color: #8b5cf6;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Discreta Seduccion</h1>
+        </div>
+        <div class="content">
+            <h2>¡Gracias por tu compra, {{orderName}}!</h2>
+            <p>Hemos procesado tu pedido con éxito. Adjunto encontrarás el recibo detallado de tu compra.</p>
+            
+            <div class="order-summary">
+                <h3>Resumen del Pedido #{{orderId}}</h3>
+                <p><strong>Fecha:</strong> {{orderDate}}</p>
+                <p><strong>Total:</strong> ${{total}}</p>
+                <p><strong>Método de pago:</strong> Tarjeta terminada en {{orderNumbersCard}}</p>
+            </div>
+
+            <p>Tu pedido será enviado a la siguiente dirección:</p>
+            <p>
+                {{orderStreet}}<br>
+                {{orderCity}} - {{orderState}}
+            </p>
+
+            <p>Puedes hacer seguimiento de tu pedido en cualquier momento haciendo clic en el botón de abajo:</p>
+            
+            <a href="{{TrackingURL}}" class="button">Seguir mi pedido</a>
+
+            <p>Si tienes alguna pregunta sobre tu pedido, no dudes en contactarnos respondiendo a este email o llamando a nuestro servicio de atención al cliente al +57 300 123 4567.</p>
+
+            <p>¡Esperamos que disfrutes de tus nuevos productos!</p>
+
+            <p>Atentamente,<br>El equipo de Discreta Seducción</p>
+        </div>
+        <div class="footer">
+            <p>Este email fue enviado a dropejosmed@gmail.com. Si prefieres no recibir estos emails, puedes <a href="#">darte de baja aquí</a>.</p>
+            <div class="social-links">
+                <a href="#">Facebook</a> | <a href="#">Instagram</a> | <a href="#">Twitter</a>
+            </div>
+            <p>&copy; 2025 Lencería Elegante. Todos los derechos reservados.</p>
+        </div>
+    </div>
+</body>
+</html>

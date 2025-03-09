@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Recibo de Compra #886910523</title>
+    <style>
+        body {
+            font-family: 'Courier New', Courier, monospace;
+            line-height: 1.4;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            max-width: 700px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: center;
+        }
+
+        .receipt {
+            width: 700px;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .receipt-header {
+            text-align: center;
+            margin-bottom: 20px;
+            background-color: #8b5cf6;
+            margin: -20px -20px 20px -20px;
+            padding: 20px;
+            color: white;
+        }
+        .receipt-header h1 {
+            font-size: 1.2em;
+            margin: 0;
+        }
+        .info{
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+        .receipt-section {
+            margin-bottom: 20px;
+            font-size: 0.9em;
+            padding: 10px;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+        }
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 5px;
+            font-size: 0.95em;
+        }
+        .items {
+            margin-bottom: 20px;
+        }
+        .item {
+            margin-bottom: 15px;
+            font-size: 0.9em;
+        }
+        .item-details {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 5px;
+        }
+        .item-image {
+            width: 50px;
+            height: 50px;
+            margin-right: 10px;
+            object-fit: cover;
+        }
+        .totals {
+            border-top: 1px dashed black;
+            padding-top: 10px;
+            margin-top: 10px;
+            font-size: 0.9em;
+        }
+        .total-line {
+            display: flex;
+            justify-content: space-between;
+            margin: 5px 0;
+        }
+        .grand-total {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-top: 10px;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 0.8em;
+        }
+        .dashed-line {
+            border-top: 1px dashed black;
+            margin: 10px 0;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            background-color: #e9ecef;
+            border-radius: 12px;
+            font-size: 0.8em;
+            margin-right: 5px;
+        }
+        .discount {
+            color: #dc3545;
+            font-weight: bold;
+        }
+        .original-price {
+            text-decoration: line-through;
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+
+        .base-price{
+            color: #6c757d;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="receipt">
+            <div class="receipt-header">
+                <h1>Pedido #{{orderId}}</h1>
+                <p>{{orderDate}}</p>
+            </div>
+            <div class="info">
+                <div class="receipt-section">
+                    <div class="section-title">Dirección de envío</div>
+                    <p>{{orderStreet}}</p>
+                    <p>{{orderCity}} - {{orderState}}</p>
+                </div>
+
+                <div class="receipt-section">
+                    <div class="section-title">Información de pago</div>
+                    <p>Tarjeta: **** {{orderNumbersCard}}</p>
+                    <p>Titular: {{orderNumbersCardHolder}}</p>
+                </div>
+
+                <div class="receipt-section">
+                    <div class="section-title">Información de cliente</div>
+                    <p>{{orderName}}</p>
+                    <p>{{orderEmail}}</p>
+                    <p>{{orderPhone}}</p>
+                </div>
+            </div>
+            <div class="dashed-line"></div>
+
+            <div class="items">
+                <div class="section-title">Productos</div>
+                {{products}}
+            <div class="dashed-line"></div>
+
+            <div class="totals">
+                <div class="total-line">
+                    <span>Subtotal</span>
+                    <span>${{subTotal}}</span>
+                </div>
+                <div class="total-line">
+                    <span>Descuento</span>
+                    <span class="discount">-${{totalDiscount}}</span>
+                </div>
+            </div>
+
+            <div class="grand-total">
+                <div class="total-line">
+                    <span>TOTAL</span>
+                    <span>${{total}}</span>
+                </div>
+            </div>
+
+            <div class="footer">
+                <p>¡Gracias por su compra!</p>
+                <p>Para seguimiento de su pedido visite:</p>
+                <p>www.discretaseducción.com</p>
+                <div class="dashed-line"></div>
+                <p>Este documento sirve como comprobante de compra</p>
+                <p>Conserve este recibo para cualquier reclamo</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
