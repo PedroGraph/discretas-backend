@@ -100,29 +100,61 @@ export class ProductModel {
 
   getAllProducts = async (query = {}) => {
     try {
-        const { page = 1, limit = 10 } = query;
-        const offset = page > 1 ? (page - 1) * limit : 0;
+      console.log(query);
+      const { page = 1, limit = 12, category, size, color } = query;
+      const offset = (page - 1) * limit;
+  
+      let where = {};
 
-        const { count, rows: allProducts } = await Product.findAndCountAll({
-          include: [{ model: Image }],
-          limit: parseInt(limit, 10),
-          offset: parseInt(offset, 10),
-        });
+      if (category) {
+        where.productCategory = Array.isArray(category) 
+          ? { [Op.in]: category } 
+          : category;
+      }
 
-        const products = allProducts.map((product) => ({
-            ...product.dataValues,
-        }));
+      const { count: totalCount, rows: allProducts } = await Product.findAndCountAll({
+        ...(Object.keys(where).length > 0 ? { where } : {}),
+        include: [{ model: Image }],
+      });
 
-        return {
-          products: transformProducts(products),
-          page: parseInt(page, 10),
-          totalPages: Math.ceil(count / limit)
-        };
+      let filteredProducts = allProducts;
+      
+      if (color) {
+        const colorLower = color.toLowerCase();
+        filteredProducts = filteredProducts.filter(product => 
+          product.characteristics && 
+          product.characteristics.some(char => 
+            char.color && char.color.toLowerCase() === colorLower
+          )
+        );
+      }
+      
+      if (size) {
+        const sizeLower = size.toLowerCase();
+        filteredProducts = filteredProducts.filter(product => 
+          product.characteristics && 
+          product.characteristics.some(char => 
+            char.size && char.size.toLowerCase() === sizeLower
+          )
+        );
+      }
 
+      const paginatedProducts = filteredProducts.slice(offset, offset + parseInt(limit, 10));
+
+      const products = paginatedProducts.map((product) => ({
+        ...product.dataValues,
+      }));
+  
+      return {
+        products: transformProducts(products),
+        page: parseInt(page, 10),
+        totalPages: Math.ceil(filteredProducts.length / limit),
+      };
+  
     } catch (error) {
-        console.log(error);
+      console.error("Error getting products:", error);
     }
-  }
+  };
 
   getProductById = async (productId) => {
     try {
@@ -164,8 +196,8 @@ export class ProductModel {
         ...(restFilters ? { where: restFilters } : {}),
         ...(orderBy ? { order: [orderBy.split("-")] } : {}),
         include: [{ model: Image }],
-        limit: parseInt(limit || 10, 10),
-        offset: parseInt((page || 1) - 1, 10) * parseInt(limit || 10, 10) || 0,
+        limit: 10,
+        offset: 0,
       }
       const products = await Product.findAll({ ...options, include: [{ model: Image }] });
       const formattedProducts = products.map((product) => {
