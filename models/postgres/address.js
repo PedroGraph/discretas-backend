@@ -79,7 +79,7 @@ export class AddressModel {
                 where: { userId },
                 order: [['createdAt', 'DESC']],
             });
-            return addresses.map(address => address.dataValues);
+            return addresses.length === 0 ? null : addresses.map(address => address.dataValues);
         } catch (error) {
             console.log(`Error Sever: Has been an error getting the addresses with userId ${userId}. Error Message: ${error}`);
         }

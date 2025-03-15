@@ -14,8 +14,8 @@ function renderEmailTemplate(data, templatePath) {
                     <div class="item-details">
                         <span>${product.name}</span>
                         <span>
-                            ${product.discount === 0 ? `<span class="base-price">$${product.price.toFixed(2)}</span>` : ''}
-                            ${product.discount > 0 ? `<span class="original-price">$${(product.price * product.discount).toFixed(2)}</span>` : ''}
+                            ${product.discount === 0 ? `<span class="base-price">$${product.price}</span>` : ''}
+                            ${product.discount > 0 ? `<span class="original-price">$${(product.price * product.discount)}</span>` : ''}
                             ${product.discount > 0 ? `<span class="discount">$${product.price}</span>` : ''}
                         </span>
                     </div>

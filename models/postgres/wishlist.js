@@ -43,7 +43,7 @@ export class WishlistModel {
                 where: { userId },
                 order: [['createdAt', 'DESC']],
             });
-            return wishlists.map(wishlist => wishlist.dataValues);
+            return wishlists.length === 0 ? null : wishlists.map(wishlist => wishlist.dataValues);
         } catch (error) {
             console.log(`Error Sever: Has been an error getting the wishlists with userId ${userId}. Error Message: ${error}`);
         }

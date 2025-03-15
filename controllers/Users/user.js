@@ -18,7 +18,7 @@ export class UserController {
       const newUser = await this.userModel.createUser(userInfo);
       await this.notificationModel.addNotificationToUser({ userId: newUser.id });
       logger.info('A new user has been created');
-      if (newUser) res.status(201).json({ info: newUser });
+      if (newUser) res.status(201).json({ success: true });
     } catch (error) {
       logger.error('Error to create user:', error);
       res.status(500).json({ message: error });
@@ -45,21 +45,27 @@ export class UserController {
     try {
       let user;
       const userInfo = req.params.id;
-      if(userInfo.includes('@')) user = await this.userModel.getUserInformation({email: userInfo});
+      if(userInfo.includes('@')) user = await this.userModel.getUserInformation(userInfo);
       else user = await this.userModel.getUserById({ id: userInfo });
       
-      if (user) {
-        const addresses = await this.addressModel.getAddressesByUserId(user.id);
+
+      if(!user) return res.status(200).json({ message: 'User not found' });
+      
+      const addresses = await this.addressModel.getAddressesByUserId(user.id);
+
+      if (addresses && addresses.length > 0) {
         const defaultAddress = addresses.find(address => address.default);
         user.address = defaultAddress.street;
         user.city = defaultAddress.city;
         user.state = defaultAddress.state;
         user.phoneNumber = defaultAddress.phone;
-        res.status(200).json(user);
       }
-      else res.status(404).json({ message: 'User not found' });
+
+      return res.status(200).json(user);
+
     } catch (error) {
       logger.error('Error to get user by ID:', error);
+      console.log(error);
       res.status(500).json({ message: 'Error en el servidor' });
     }
   };
@@ -104,22 +110,46 @@ export class UserController {
       const user = await this.userModel.login(email, password);
 
       if (!user) {
-        logger.warn('Login failed: ', email);
-        return res.status(401).json({ message: 'Credentials invalid' });
+        return res.status(401).json({ 
+          success: false, 
+          error: 'Invalid credentials' 
+        });
       }
-      const token = generateToken(user);
 
-      logger.info('Login successful: ', email);
-      res.json({ token, user });
-
+      const token = generateToken(user.id);
+  
+      res.cookie('DSDSsessionId', token, {
+        maxAge: 7 * 24 * 60 * 60 * 1000, 
+        httpOnly: process.env.NODE_ENV === 'production', 
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+        path: '/',
+        domain: process.env.NODE_ENV === 'production' 
+          ? 'discreta-seduccion.web.app'
+          : 'localhost'
+      });
+  
+      logger.info('Login successful:', email);
+      res.json({ 
+        success: true,
+        user: {
+          id: user.id,
+          email: user.email,
+        }
+      });
+  
     } catch (error) {
-      console.error('Error to login:', error);
-      res.status(500).json({ message: 'Error en el servidor' });
+      logger.error('Login error:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Server error' 
+      });
     }
   };
 
   logout = async (req, res) => {
     try {
+      if(!req.headers.cookie) return res.status(401).json({ message: 'Token no proporcionado.' });
       const cookieInfo = req.headers.cookie;
       const match = cookieInfo.match(/DSsessionId=([^;]+)/);
       const token = match ? match[1] : null;
@@ -153,7 +183,7 @@ export class UserController {
       const decodedToken = await verifyGoogleToken(tokenId);
       const uid = decodedToken.uid;
 
-      const user = await this.userModel.getUserInformation({email: req.body.email});
+      const user = await this.userModel.getUserInformation(req.body.email);
       if (!user) {
         return res.status(404).json({ 
           success: false, 
@@ -209,9 +239,12 @@ export class UserController {
     }
   }
 
-  passwordRecovery = async (req, res) =>{
-    try{
+  passwordRecovery = async (req, res) => {
+    try {
       const { email } = req.body;
+
+      if(!email) return res.status(400).json({ message: 'Email is required' });
+
       const user = await this.userModel.getUserInformation(email);
 
       if (!user) {
@@ -221,43 +254,58 @@ export class UserController {
 
       const token = passwordRecoveryCode();
       user.resetToken = token;
-      user.resetTokenExpiration = Date.now() + 3600000; 
-      const updatedUser = await this.userModel.updateUserById(user.id, user);
-      const response = await sendPasswordRecoveryEmail(updatedUser.dataValues);
+      user.resetTokenExpiration = Date.now() + 3600000;
 
-      if (response) {
-        logger.info(`Email sent to: `, email);
-        return res.status(200).json({ info: 'A code has been sent to your email. Please check your email' });
-      }
+      await this.userModel.updateUserById(user.id, user);
 
-      logger.warn('Password recovery failed: ', email);
-      return res.status(404).json({ message: 'User not found' });
+      const encodedEmail = Buffer.from(email).toString('base64');
+      const recoveryUrl = `${process.env.NODE_ENV === 'test' ? process.env.SITE_URL_TEST : process.env.SITE_URL_PROD}/recovery-password/success/${encodedEmail}`;
+
+      const response = await sendPasswordRecoveryEmail({
+        email: user.email,
+        recoveryUrl,
+        resetToken: token,
+      });
+
+      if (user) logger.info(`Email sent to: `, email);
+      return res.status(200).json({ encodedEmail });
 
     } catch (error) {
-      logger.error('Error to recovery password:', error);
+      logger.error('Error to recover password:', error);
+      console.error(error);
       res.status(500).json({ message: 'Error en el servidor' });
     }
-  }
+  };
 
-  verifyPasswordRecoveryCode = async (req, res) => {
+   verifyPasswordRecoveryCode = async (req, res) => {
     try {
-      const { email, recoveryCode } = req.body;
-      const user = await this.userModel.getUserInformation(email);
+      const { email: encodedEmail, recoveryCode } = req.body;
+      const email = Buffer.from(encodedEmail, 'base64').toString('utf-8');
+      const user = await this.userModel.getUserInformation(email, true);
+
       if (!user) {
         logger.warn('Password recovery failed: ', email);
         return res.status(404).json({ message: 'User not found' });
       }
-      if (user.resetToken === recoveryCode && user.resetTokenExpiration > Date.now()) {
+    
+      if (user.resetToken.replace(/-/g, '') === recoveryCode.replace(/-/g, '') && user.resetTokenExpiration > Date.now()) {
+        const resetToken = 0; 
+        user.resetToken = null;
+        user.resetTokenExpiration = null;
+        await this.userModel.updateUserById(user.id, user);
         logger.info('Password recovery successful: ', email);
         return res.status(200).json({ info: 'Password recovery successful' });
       }
-      logger.warn('Password recovery failed: ', email);
-      return res.status(404).json({ message: 'User not found' }); 
+
+      logger.warn('Invalid recovery code or expired: ', email);
+      return res.status(400).json({ message: 'Invalid or expired recovery code' });
+
     } catch (error) {
+      console.log(error);
       logger.error('Error to verify password recovery code:', error);
       res.status(500).json({ message: 'Error en el servidor' });
     }
-  }
+  };
   
   changePassword = async (req, res) => {
     try {
@@ -280,6 +328,8 @@ export class UserController {
   getNotificationsByUserId = async (req, res) => {  
     try {
       const { userId } = req.params;
+      if(!userId) return res.status(400).json({ error: 'User id is required' });
+
       const notifications = await this.notificationModel.getNotificationsByUserId(userId);
       if (!notifications) {
         logger.warn(`Notifications not found for user ${userId}`);
@@ -298,8 +348,9 @@ export class UserController {
   updateNotificationById = async (req, res) => {
     try {
       const { userId } = req.params;
+      if(!userId) return res.status(400).json({ error: 'User id is required' });
+      
       const updatedNotification = req.body;
-
       const response = await this.notificationModel.updateNotificationById(userId, updatedNotification);
       if (response) {
         logger.info(`Notification ${userId} updated successfully`);

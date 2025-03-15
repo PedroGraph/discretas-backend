@@ -1,5 +1,10 @@
 import logger from '../../logCreator/log.js';
 import { sendReceiptEmail } from '../../utils/nodemails.js';
+import { currencyFormat } from '../../utils/formaters.js';
+import fs from 'fs';
+import env from 'dotenv';
+env.config();
+
 
 export class OrderController {
   constructor( orderModel, productModel, userModel, paymentModel ) {
@@ -152,16 +157,17 @@ export class OrderController {
 
           const product = {
             name: productInfo.name,
-            price: productInfo.price,
+            price: currencyFormat(productInfo.price),
+            numberPrice: productInfo.price,
             quantity,
             size,
             color,
             discount,
           };
 
-          totalPrice += product.price * quantity;
+          totalPrice += product.numberPrice * quantity;
           if (discount > 0) {
-            totalDiscount += (product.price * quantity) * (discount / 100);
+            totalDiscount += (product.numberPrice * quantity) * (discount / 100);
           }
 
           return product;
@@ -184,10 +190,10 @@ export class OrderController {
         orderPhone: userInfo.phoneNumber,
         orderNumbersCard: paymentInfo.cardLastFourDigits,
         orderNumbersCardHolder: paymentInfo.cardholderName,
-        totalDiscount: discount > 0 ? discount : discount,
-        subTotal: totalPrice,
-        total: totalPrice,
-        TrackingURL: `http://localhost:4000/ordernes/${orderId}`,
+        totalDiscount: currencyFormat(discount > 0 ? discount : discount),
+        subTotal: currencyFormat(totalPrice),
+        total: currencyFormat(totalPrice),
+        TrackingURL: `http://${process.env.NODE_ENV === 'test' ? process.env.SITE_URL_TEST : process.env.SITE_URL_PROD}/ordernes/${orderId}`,
       };
 
       const receipt = await sendReceiptEmail(response);
@@ -195,7 +201,12 @@ export class OrderController {
       logger.info(`Order ${orderId} receipt generated successfully`);
       return res.download(receipt, `receipt-${orderId}.pdf`, (err) => {
         if (err) logger.error(`Error downloading receipt - Server error. Error message: ${err}`);
+        fs.unlink(receipt, (err) => {
+          if (err) logger.error(`Error deleting receipt - Server error. Error message: ${err}`);
+        });
       });
+
+
     } catch (error) {
       logger.error(`Error generating order receipt - Server error. Error message: ${error}`);
       res.status(500).json({

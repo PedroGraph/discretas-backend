@@ -47,7 +47,8 @@ export class NotificationsModel {
                 where: { userId: userLoggedId },
                 order: [['createdAt', 'DESC']],
             });
-            const { updatedAt, createdAt, userId, ...notificationInfo } = notifications[0].dataValues;
+            if(notifications.length === 0) return null;
+            const { updatedAt, createdAt, userId, ...notificationInfo } = notifications[0]?.dataValues;
             return notificationInfo;
         } catch (error) {
             console.log(`Error Sever: Has been an error getting the notifications with userId ${userLoggedId}. Error Message: ${error}`);

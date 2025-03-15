@@ -86,10 +86,11 @@ export class UserModel {
     }
   }
 
-  async getUserInformation(email) {
+  async getUserInformation(email, allInfo = false) {
     try {
-      const user = await User.findOne({ where: email });
+      const user = await User.findOne({ where: { email } }); 
       if (!user) return null;
+      if(allInfo) return user?.dataValues;
       const {password, resetToken, resetTokenExpiration, emailSubscription, updatedAt, createdAt, ...userInfo} = user?.dataValues;
       return userInfo;
     } catch (error) {

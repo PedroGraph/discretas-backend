@@ -20,6 +20,7 @@ export class AddressController {
 
     getAddressById = async (req, res) => {
         const { addressId } = req.params;
+        if(!addressId) return res.status(400).json({ error: 'Missing addressId' });
         try {
             const address = await this.addressesModel.getAddressById(addressId);
             if (!address) {
@@ -82,6 +83,7 @@ export class AddressController {
 
     getAddressesByUserId = async (req, res) => {
         const { userId } = req.params;
+        if(!userId) return res.status(400).json({ error: 'User id is required' });
         try {
             const addresses = await this.addressesModel.getAddressesByUserId(userId);
             if (!addresses) {

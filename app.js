@@ -27,9 +27,11 @@ export const mainApp = async (models) => {
   app.use(express.json());
   app.use(cookieParser());
   app.use(cors({
+    origin: 'http://localhost:4000', 
     credentials: true,
-    allowedHeaders: 'Content-Type,Authorization'
+    allowedHeaders: 'Content-Type,Authorization,',
   }));
+  
 
   mainRoutes(app, models, redisClient);
 
@@ -37,7 +39,6 @@ export const mainApp = async (models) => {
   app.listen(port, () =>
     console.log(`La aplicación está corriendo en http://localhost:${port}`),
   );
-  
 
   return app;
 }

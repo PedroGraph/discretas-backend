@@ -21,6 +21,7 @@ export class WishlistController {
 
     getWishlistsByUserId = async (req, res) => {
         const { userId } = req.params;
+        if(!userId) return res.status(400).json({ error: 'User id is required' });
         try {
             const wishlists = await this.wishlistModel.getWishlistsByUserId(userId);
             if (!wishlists) {
