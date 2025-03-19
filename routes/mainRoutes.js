@@ -27,7 +27,7 @@ export const mainRoutes = (app, models, redis) => {
     app.use('/api/shopping', creatingShoppingCartRouter({ shoppingCartModel, productModel }));
     app.use('/api/orders', creatingOrders({ orderModel, productModel, userModel, paymentModel }));
     app.use('/api/discounts', verifyDiscounts({ discountCodeModel, usedDiscountCodeModel }));
-    app.use('/api/mercadoPago', mercadoPagoRoute({ MercadoPagoModel: mercadoPagoModel, PaymentModel: paymentModel }));
+    app.use('/api/payment', mercadoPagoRoute({ MercadoPagoModel: mercadoPagoModel, PaymentModel: paymentModel }));
     app.use('/api/addresses', creatingAddress({ addressModel }));
     app.use('/api/wishlists', creatingWishlist({ wishlistModel, productModel }));
 }
