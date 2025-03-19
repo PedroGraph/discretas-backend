@@ -91,14 +91,11 @@ export class OrderModel {
     }
   }
 
-  async getAllOrders(userId, limitDate) {
+  async getAllOrders(userId) {
     try {
       const allOrders = await Order.findAll({
         where: {
-          userId,
-          createdAt: {
-            [Op.between]: [new Date(limitDate), new Date()],
-          },
+          userId
         },
         order: [['createdAt', 'DESC']],
       });
