@@ -82,9 +82,9 @@ export class OrderController {
   getAllOrders = async (req, res) => {
     try {
       const { userId } = req.params;
-      const { date } = req.query;
+      // const { date } = req.query;
 
-      let getAllOrders = await this.orderModel.getAllOrders(userId, date);
+      let getAllOrders = await this.orderModel.getAllOrders(userId);
   
       if (getAllOrders.length === 0) {
         logger.warn(`Orders by ${userId} were not found`);
