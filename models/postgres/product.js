@@ -100,7 +100,6 @@ export class ProductModel {
 
   getAllProducts = async (query = {}) => {
     try {
-      console.log(query);
       const { page = 1, limit = 12, category, size, color } = query;
       const offset = (page - 1) * limit;
   
